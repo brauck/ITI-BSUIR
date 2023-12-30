@@ -41,4 +41,5 @@ int main() {
 	test(z1, z2);
 	
 	return 0;
+	system(pause);
 }
