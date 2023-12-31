@@ -7,9 +7,9 @@
 
 using namespace std;
 
-double xEdge{ 1.0 };
-double yBottom{ 2.0 };
-double yTop{ 4.0 };
+const double xEdge{ 1.0 };
+const double yBottom{ 2.0 };
+const double yTop{ 4.0 };
 
 double numX{};
 double numY{};
