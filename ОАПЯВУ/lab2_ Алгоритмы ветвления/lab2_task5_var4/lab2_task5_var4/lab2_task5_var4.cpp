@@ -20,24 +20,24 @@ double divisor(double x, double y, double z)
 double qFormula()
 {
 	bool isFirstIteration = true;
-	bool isWrite = false;
+	bool isRight = false;
 	double x{};
 	double y{};
 	double z{};
 	double q{};
 	cout << "Введите три разных числа" << endl;
-	while (!isWrite)
+	while (!isRight)
 	{
 		if (isFirstIteration) isFirstIteration = false;
 		else cout << "Введите другие числа" << endl;
 		cin >> x >> y >> z;		
 		divisor(x, y, z) == 0 ? printf("Делитель равняется нулю\n")
-			: isWrite = true;
-		if (!isWrite) continue;
-		x == y ? printf("Числа должны быть разными\n", isWrite = false)
-			: x == z ? printf("Числа должны быть разными\n", isWrite = false)
-			: y == z ? printf("Числа должны быть разными\n", isWrite = false)
-			: isWrite = true;
+			: isRight = true;
+		if (!isRight) continue;
+		x == y ? printf("Числа должны быть разными\n", isRight = false)
+			: x == z ? printf("Числа должны быть разными\n", isRight = false)
+			: y == z ? printf("Числа должны быть разными\n", isRight = false)
+			: isRight = true;
 	}
 	q = divident(x, y, z) / divisor(x, y, z);
 	cout << "q = " << q << endl;
