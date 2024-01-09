@@ -136,12 +136,12 @@ void main()
 		}
 	}
 	cout << "Оттепель началась в день номер "
-		<< plusAfterMinus << " периода" << endl;
+		<< plusAfterMinus << endl;
 		
 	// Самая длинная последовательность дней с одинаковой температурой
-	int maxLength{};
+	int maxLength{1};
 	int count{1};
-	int sequenceTempereture;
+	double sequenceTemperature{};
 	for (int i = 0; i < N - 1; i++)
 	{
 		if (temperature[i + 1] == temperature[i])
@@ -150,13 +150,16 @@ void main()
 		}
 		else
 		{
-			maxLength = count;
+			if (maxLength < count)
+			{
+				maxLength = count;
+				sequenceTemperature = temperature[i];
+			}				
 			count = 1;
 		}		
 	}
 	cout << "Самая длинная последовательность дней с одинаковой температурой: "
-		<< 
-
+		<< maxLength << "\n    при температуре " << sequenceTemperature << endl;
 
 	system("pause");
 }
