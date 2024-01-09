@@ -7,6 +7,9 @@ using namespace std;
 
 void main()
 {
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+
 	bool isSpace = true;
 	int n{};
 	cout << "Введите число от 0 до 20: ";

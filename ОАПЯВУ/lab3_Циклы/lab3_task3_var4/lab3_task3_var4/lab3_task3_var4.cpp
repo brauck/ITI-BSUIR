@@ -58,7 +58,7 @@ int main()
 	printf("  |%10c%10c|%12s%8c|%12s%8c|%16s%4c|\n",
 		'x', ' ', "S(x)", ' ', "Y(x)", ' ', "| Y(x)-S(x) |", ' ');
 	printLine();
-    double s{};
+        double s{};
 	double y{};	
 	double yXAbs{};
 	for (double x = a; x <= b; x += h)
