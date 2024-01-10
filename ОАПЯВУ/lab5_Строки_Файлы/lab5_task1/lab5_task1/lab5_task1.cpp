@@ -18,7 +18,7 @@ void main()
 	if (fopen_s(&file, filename, "w"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
-		return; //???????????????????
+		return;
 	}
 
 	int i = 1;
@@ -26,7 +26,7 @@ void main()
 	{
 		cout << i << ": ";
 		gets_s(str, 79);
-		if (strlen(str) == 0)
+		if (strlen(str) == 2 && str[0] == '0' && str[1] == '0')
 			break;
 		fprintf(file, "%d %s \n", i, str); 
 		i++;
