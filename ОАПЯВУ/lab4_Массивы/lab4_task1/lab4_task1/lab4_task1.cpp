@@ -85,19 +85,19 @@ void main()
 				switch (day)
 				{
 				case 0: cout << "в понедельник "
-					<< i + 1 << " день " << endl; break;
+					<< "день: " << i + 1 << endl; break;
 				case 1: cout << "во вторник "
-					<< i + 1 << " день" << endl; break;
+					<< "день: " << i + 1 << endl; break;
 				case 2: cout << "в среду "
-					<< i + 1 << " день" << endl; break;
+					<< "день: " << i + 1 << endl; break;
 				case 3: cout << "в четверг "
-					<< i + 1 << " день" << endl; break;
+					<< "день: " << i + 1 << endl; break;
 				case 4: cout << "в пятницу "
-					<< i + 1 << " день" << endl; break;
+					<< "день: " << i + 1 << endl; break;
 				case 5: cout << "в субботу "
-					<< i + 1 << " день" << endl; break;
+					<< "день: " << i + 1 << endl; break;
 				case 6: cout << "в воскресенье "
-					<< i + 1 << " день" << endl; break;
+					<< "день: " << i + 1 << endl; break;
 				}
 			}
 			if (isFirstString)
@@ -107,19 +107,19 @@ void main()
 			}
 			switch (day)
 			{
-			case 0: printf("%30c%s%d день\n",
+			case 0: printf("%30c%s день: %d\n",
 				' ', "в понедельник ", i + 1); break;
-			case 1: printf("%30c%s%d день\n",
+			case 1: printf("%30c%s день: %d\n",
 				' ', "во вторник ", i + 1); break;
-			case 2: printf("%30c%s%d день\n",
+			case 2: printf("%30c%s день: %d\n",
 				' ', "в среду ", i + 1); break;
-			case 3: printf("%30c%s%d день\n",
+			case 3: printf("%30c%s день: %d\n",
 				' ', "в четверг ", i + 1); break;
-			case 4: printf("%30c%s%d день\n",
+			case 4: printf("%30c%s день: %d\n",
 				' ', "в пятницу ", i + 1); break;
-			case 5: printf("%30c%s%d день\n",
+			case 5: printf("%30c%s день: %d\n",
 				' ', "в субботу ", i + 1); break;
-			case 6: printf("%30c%s%d день\n",
+			case 6: printf("%30c%s день: %d\n",
 				' ', "в воскресенье ", i + 1); break;
 			}
 		}
@@ -135,8 +135,7 @@ void main()
 			break;
 		}
 	}
-	cout << "Оттепель началась в день номер "
-		<< plusAfterMinus << endl;
+	cout << "Оттепель началась в день: " << plusAfterMinus << endl;
 		
 	// Самая длинная последовательность дней с одинаковой температурой
 	int maxLength{1};
@@ -159,7 +158,7 @@ void main()
 		}		
 	}
 	cout << "Самая длинная последовательность дней с одинаковой температурой: "
-		<< maxLength << "\n    при температуре " << sequenceTemperature << endl;
+		<< maxLength << "\n    при температуре: " << sequenceTemperature << endl;
 
 	system("pause");
 }
