@@ -52,13 +52,12 @@ void save()
 	FILE* file;
 	char filename[50];
 	cout << "Введите имя файла: ";
-	//strcat(filename, ".txt");
 	cin >> filename;
 	cin.ignore();
 	if (fopen_s(&file, filename, "w"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
-		return; //???????????????????
+		return;
 	}
 	fputs(str, file);
 	fclose(file);
@@ -71,13 +70,12 @@ void load()
 	FILE* file;
 	char filename[50];
 	cout << "Введите имя файла: ";
-	//strcat(filename, ".txt");
 	cin >> filename;
 	cin.ignore();
 	if (fopen_s(&file, filename, "r"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
-		return; //???????????????????
+		return;
 	}
 	fgets(str, 79, file);
 	fclose(file);
@@ -85,30 +83,6 @@ void load()
 	system("pause");
 }
 void main()
-/*/ {
-	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
-
-	char str[80];
-	
-
-	int i = 1;
-	while (true)
-	{
-		cout << i << ": ";
-		gets_s(str, 79);
-		if (strlen(str) == 0)
-			break;
-		fprintf(file, "%d %s \n", i, str);
-		i++;
-	}
-
-	fclose(file);
-
-	system("pause");
-}*/
-
-// task2
 {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
@@ -133,9 +107,9 @@ void main()
 		case 2: output(); break;
 		case 3: code(); break;
 		case 4: decode(); break;
-		case 5:save(); break;
-		case 6:load(); break;
-		case 0:return; 
+		case 5: save(); break;
+		case 6: load(); break;
+		case 0: return; 
 		default: cout << "Команда неизвестна" << endl; break;			
 		}
 
