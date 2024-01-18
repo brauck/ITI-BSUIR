@@ -30,13 +30,12 @@ int main()
 {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
-			
+	srand((unsigned)time(NULL));
 	for (int i = 0; i < 4; i++)
 	{
 		double z1 = formulaZ1(a);
 		double z2 = formulaZ2(a);
-		test(z1, z2);
-		srand((unsigned)time(NULL) * (i+1) % 100);
+		test(z1, z2);		
 		a = rand() % 63 / 10.0;					// Покрытие 360 градусов
 	}
 	
