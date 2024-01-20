@@ -5,19 +5,19 @@
  
 using namespace std;
 
-char S[161];
+char str[80];
 
 void input()
 {
 	cout << "Введите строку: ";
 	cin.ignore();
-	gets_s(S, 80);
+	gets_s(str, 79);
 }
 
 void output()
 {
 	cout << "Результирующая строка: ";
-	cout << S << endl;
+	cout << str << endl;
 	system("pause");
 }
 
@@ -26,9 +26,9 @@ void code()
 	int Q = 256;
 	int k = 13;
 	char c1 = '\0';
-	for (int i = 0; i < strlen(S); i++)
+	for (int i = 0; i < strlen(str); i++)
 	{
-		S[i] = c1 + (S[i] + k) % Q;
+		str[i] = c1 + (str[i] + k) % Q;
 	}
 	cout << "Строка зашифрована" << endl;
 	system("pause");
@@ -39,9 +39,9 @@ void decode()
 	int Q = 256;
 	int k = 13;
 	char c1 = '\0';
-	for (int i = 0; i < strlen(S); i++)
+	for (int i = 0; i < strlen(str); i++)
 	{
-		S[i] = c1 + (S[i] - k) % Q;
+		str[i] = c1 + (str[i] - k) % Q;
 	}
 	cout << "Строка расшифрована" << endl;
 	system("pause");
@@ -59,9 +59,9 @@ void save()
 		cout << "Ошибка открытия файла: " << filename << endl;
 		return;
 	}
-	fputs(S, file);
+	fputs(str, file);
 	fclose(file);
-	cout << "Файл успешно сохранен" << endl;
+	cout << "Строка записана в файл" << endl;
 	system("pause");
 }
 
@@ -77,9 +77,9 @@ void load()
 		cout << "Ошибка открытия файла: " << filename << endl;
 		return;
 	}
-	fgets(S, 160, file);
+	fgets(str, 79, file);
 	fclose(file);
-	cout << "Файл успешно прочитан" << endl;
+	cout << "Строка считана" << endl;
 	system("pause");
 }
 void main()
@@ -87,7 +87,7 @@ void main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	int option;
+	int pr;
 
 	while (true)
 	{
@@ -99,9 +99,9 @@ void main()
 		cout << "( 5 ) записать строку в текстовый файл (имя файла задает пользователь)" << endl;
 		cout << "( 6 ) считать строку из текстового файла (имя файла задает пользователь)" << endl;
 		cout << "( 0 ) завершить работу" << endl;
-		cin >> option;
+		cin >> pr;
 		
-		switch (option)
+		switch (pr)
 		{
 		case 1: input(); break;
 		case 2: output(); break;
@@ -109,9 +109,7 @@ void main()
 		case 4: decode(); break;
 		case 5: save(); break;
 		case 6: load(); break;
-		case 0: cout << "Сеанс окончен!" << endl;
-			system("pause");
-			return;
+		case 0: return; 
 		default: cout << "Команда неизвестна" << endl; break;			
 		}
 

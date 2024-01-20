@@ -14,7 +14,7 @@ int main()
     char str[81] = { 'A', 'B', 'C', 'D', 'E', 'Z' };
     char codeStr[161] = {};
 
-    cout << str << endl;
+    cout << 01 << str[strlen(str) - 1] << endl;
 
 
     int base{};

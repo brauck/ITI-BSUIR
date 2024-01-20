@@ -62,5 +62,6 @@ BenchmarkDotNet.Artifacts
 *.pfx
 
 # CPP
+555
 **/x64/
 *.vcxproj*
