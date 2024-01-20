@@ -67,13 +67,14 @@ int main()
     }
 
     cout << codeStr << ' ' << strlen(codeStr) << endl;
-
-    
+    strcpy_s(S, codeStr);
+    cout << S << endl;
 
     int toTens{};
     int toOnes{};
     char letter{};
     
+    strcpy_s(S, "");
     shift = 1;
     int Sindex{};
 
@@ -95,7 +96,7 @@ int main()
         }
         Sindex++;
     }
-    
+    S[Sindex] = '\0';
     cout << S << endl;
     
        
@@ -127,3 +128,4 @@ int main()
 }
 
 //The quick brown fox jumps over the lazy dog
+// Быстрая коричневая лиса прыгает через ленивую собаку!

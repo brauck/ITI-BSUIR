@@ -1,11 +1,12 @@
 ﻿// Lab #5
 // task #2
 #include <iostream>
-#include <Windows.h>
- 
+#include <Windows.h> 
 using namespace std;
 
-char S[161];
+const int offset = 48;
+char S[161] = {};
+char codeStr[161] = {};
 
 void input()
 {
@@ -21,30 +22,71 @@ void output()
 	system("pause");
 }
 
+// Вариант 4: Буквы заменяются на их номер в алфавите
+// Условно считаем: Прописные буквы: (А - Я) -> (01 - 32)
+//                  Строчные буквы:  (а - я) -> (33 - 64)
 void code()
 {
-	int Q = 256;
-	int k = 13;
-	char c1 = '\0';
+	int base{};
+	int tens{};
+	int ones{};
+	int shift{};
+
 	for (int i = 0; i < strlen(S); i++)
 	{
-		S[i] = c1 + (S[i] + k) % Q;
+		if (S[i] < 0)           // int('А') -> -64, int('я') -> -1
+		{			
+			base = (S[i]) + 65; 
+			tens = base / 10;
+			ones = base % 10;
+
+			codeStr[shift] = char(tens + offset);
+			codeStr[shift + 1] = char(ones + offset);
+
+			shift += 2;
+		}
+		else
+		{
+			codeStr[shift] = S[i];
+			shift++;
+		}
+
 	}
+
+	strcpy_s(S, codeStr);
 	cout << "Строка зашифрована" << endl;
 	system("pause");
 }
 
 void decode()
 {
-	int Q = 256;
-	int k = 13;
-	char c1 = '\0';
-	for (int i = 0; i < strlen(S); i++)
+	strcpy_s(S, "");
+
+	int shift{};
+	int Sindex{};
+	int toTens{};
+	int toOnes{};
+	char letter{};	
+
+	for (int i = 0; i < strlen(codeStr); i += shift)
 	{
-		S[i] = c1 + (S[i] - k) % Q;
+		if (codeStr[i] > 47 && codeStr[i] < 58)
+		{
+			shift = 2;
+			cout << i << endl;
+			toTens = int(codeStr[i]) - offset;
+			toOnes = int(codeStr[i + 1]) - offset;
+			letter = char(toTens * 10 + toOnes - 65);
+			S[Sindex] = letter;
+		}
+		else
+		{
+			shift = 1;
+			S[Sindex] = codeStr[i];
+		}
+		Sindex++;
 	}
-	cout << "Строка расшифрована" << endl;
-	system("pause");
+	S[Sindex] = '\0';
 }
 
 void save()
@@ -109,10 +151,10 @@ void main()
 		case 4: decode(); break;
 		case 5: save(); break;
 		case 6: load(); break;
-		case 0: cout << "Сеанс окончен!" << endl;
+		case 0: cout << "Сеанс окончен!" << endl; return;
+		default: cout << "Команда неизвестна" << endl;
 			system("pause");
-			return;
-		default: cout << "Команда неизвестна" << endl; break;			
+			break;			
 		}
 
 	}
