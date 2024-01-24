@@ -1,5 +1,6 @@
 ﻿// Lab #5
 // task #2
+// variant #4
 #include <iostream>
 #include <cstring>
 #include <Windows.h> 
@@ -32,13 +33,11 @@ void output()
 void code()
 {
 	memset(codeStr, 0, sizeof(codeStr)); // обнуление строки
-	
+
 	int base{};
 	int tens{};
 	int ones{};
 	int shift{};
-
-	
 
 	for (int i = 0; i < strlen(S); i++)
 	{
@@ -53,7 +52,9 @@ void code()
 
 			shift += 2;
 		}
-		else if (S[i] > 47 && S[i] < 58) // Если вводимое значение цифра
+		// Если вводимое значение цифра,
+		// для индикации добавляем два нуля
+		else if (S[i] > 47 && S[i] < 58)
 		{
 			codeStr[shift] = '0';
 			codeStr[shift + 1] = '0';
@@ -66,9 +67,7 @@ void code()
 			codeStr[shift] = S[i];
 			shift++;
 		}
-
 	}
-	cout << strlen(codeStr) << endl; 
 	strcpy_s(S, codeStr);
 	cout << "Строка зашифрована" << endl;
 	system("pause");
@@ -86,13 +85,11 @@ void decode()
 	{
 		if (S[i] == '0' && S[i + 1] == '0')
 		{
-			//cout << "in digit" << endl;
 			shift = 3;
 			decodeStr[decodeIndex] = S[i + 2];
 		}
 		else if (S[i] > 47 && S[i] < 58)
 		{
-			//cout << "in letter" << endl;
 			shift = 2;
 			toTens = int(S[i]) - offset;
 			toOnes = int(S[i + 1]) - offset;
@@ -101,7 +98,6 @@ void decode()
 		}
 		else
 		{
-			//cout << "in other" << endl;
 			shift = 1;
 			decodeStr[decodeIndex] = S[i];
 		}
@@ -115,36 +111,75 @@ void decode()
 
 void save()
 {
+	errno_t err;
+
 	FILE* file;
 	char filename[50];
 	cout << "Введите имя файла: ";
 	cin >> filename;
 	cin.ignore();
-	if (fopen_s(&file, filename, "w"))
+	strcat_s(filename, 50, ".txt");
+	err = fopen_s(&file, filename, "w");
+	if (err == 0)
 	{
-		cout << "Ошибка открытия файла: " << filename << endl;
+		printf("Файл %s открыт\n", filename);
+	}
+	else
+	{
+		printf("Ошибка открытия файла: %s\n", filename);
+		system("pause");
 		return;
 	}
 	fputs(S, file);
-	fclose(file);
+	if (file)
+	{
+		err = fclose(file);
+		if (err == 0)
+		{
+			printf("Файл %s закрыт\n", filename);
+		}
+		else
+		{
+			printf("Ошибка закрытия файла: %s\n", filename);
+		}
+	}
 	cout << "Файл успешно сохранен" << endl;
 	system("pause");
 }
 
 void load()
 {
+	errno_t err;
+
 	FILE* file;
 	char filename[50];
 	cout << "Введите имя файла: ";
 	cin >> filename;
 	cin.ignore();
-	if (fopen_s(&file, filename, "r"))
+	err = fopen_s(&file, filename, "r");
+	if (err == 0)
 	{
-		cout << "Ошибка открытия файла: " << filename << endl;
+		printf("Файл %s открыт\n", filename);
+	}
+	else
+	{
+		printf("Ошибка открытия файла: %s\n", filename);
+		system("pause");
 		return;
 	}
-	fgets(S, 160, file);
-	fclose(file);
+	fgets(S, 240, file);
+	if (file)
+	{
+		err = fclose(file);
+		if (err == 0)
+		{
+			printf("Файл %s закрыт\n", filename);
+		}
+		else
+		{
+			printf("Ошибка закрытия файла: %s\n", filename);
+		}
+	}
 	cout << "Файл успешно прочитан" << endl;
 	system("pause");
 }

@@ -63,5 +63,7 @@ BenchmarkDotNet.Artifacts
 
 # CPP
 555
+666
+string.txt
 **/x64/
 *.vcxproj*

@@ -8,9 +8,9 @@ using namespace std;
 
 const int offset = 48;
 
-char S[241] = {};         // Если все вводимые значения цифры: 80 * 3 + '\0'
-char codeStr[241] = {};
-char decodeStr[81] = {};
+char S[241];         // Если все вводимые значения цифры: 80 * 3 + '\0'
+char codeStr[241];
+char decodeStr[81];
 
 
 void input()
@@ -30,9 +30,10 @@ void output()
 // Вариант 4: Буквы заменяются на их номер в алфавите
 // Условно считаем: Прописные буквы: (А - Я) -> (01 - 32)
 //                  Строчные буквы:  (а - я) -> (33 - 64)
+//                  Буквы Ё, ё игнорируются
 void code()
 {
-	memset(codeStr, 0, sizeof(codeStr)); // обнуление строки
+	memset(codeStr, 0, sizeof(codeStr));    // сброс строки
 
 	int base{};
 	int tens{};
@@ -41,7 +42,7 @@ void code()
 
 	for (int i = 0; i < strlen(S); i++)
 	{
-		if (S[i] < 0)           // int('А') -> -64, int('я') -> -1
+		if (S[i] > -65 && S[i] < 0)         // int('А') -> -64, int('я') -> -1
 		{
 			base = (S[i]) + 65;
 			tens = base / 10;
@@ -52,9 +53,9 @@ void code()
 
 			shift += 2;
 		}
-		// Если вводимое значение цифра,
+		// Если вводимое значение цифра;
 		// для индикации добавляем два нуля
-		else if (S[i] > 47 && S[i] < 58)
+		else if (S[i] > 47 && S[i] < 58)    // Коды ASCII для цифр
 		{
 			codeStr[shift] = '0';
 			codeStr[shift + 1] = '0';
@@ -112,17 +113,22 @@ void decode()
 void save()
 {
 	FILE* file;
-	char filename[50];
+	char filename[100];
 	cout << "Введите имя файла: ";
 	cin >> filename;
 	cin.ignore();
+	strcat_s(filename, 100, ".txt");
 	if (fopen_s(&file, filename, "w"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
 		return;
 	}
 	fputs(S, file);
-	fclose(file);
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
 	cout << "Файл успешно сохранен" << endl;
 	system("pause");
 }
@@ -130,17 +136,21 @@ void save()
 void load()
 {
 	FILE* file;
-	char filename[50];
+	char filename[100];
 	cout << "Введите имя файла: ";
 	cin >> filename;
 	cin.ignore();
 	if (fopen_s(&file, filename, "r"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
 		return;
 	}
 	fgets(S, 240, file);
-	fclose(file);
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
 	cout << "Файл успешно прочитан" << endl;
 	system("pause");
 }
@@ -161,7 +171,16 @@ void main()
 		cout << "( 5 ) записать строку в текстовый файл (имя файла задает пользователь)" << endl;
 		cout << "( 6 ) считать строку из текстового файла (имя файла задает пользователь)" << endl;
 		cout << "( 0 ) завершить работу" << endl;
+
 		cin >> option;
+		if (!cin)
+		{
+			cin.clear();
+			cin.ignore(100, '\n');
+			cout << "Команда неизвестна" << endl;
+			system("pause");
+			continue;
+		}
 
 		switch (option)
 		{
