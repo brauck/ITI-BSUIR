@@ -18,6 +18,7 @@ void input()
 	cout << "Введите строку: ";
 	cin.ignore();
 	gets_s(S, 80);
+	system("pause");
 }
 
 void output()
