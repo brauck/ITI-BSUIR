@@ -7,6 +7,7 @@ using namespace std;
 void noArguments();
 bool byValue(int, int);
 void byReference(int&, int, int);
+int* byAddressStaticArray(int[], int);
 
 void main()
 {
@@ -36,7 +37,18 @@ void main()
 	cout << "Максимум из 3-х чисел: " << a << endl;
 	cout << "Конечное значение первого аргумента: " << a << endl;
 
-
+	cout << "\nФункция 4 получает в качестве аргументов - "
+		<< "одномерный статический массив и его размер, "
+		<< "возвращает – указатель на искомый по заданию элемент "
+		<< "(или NULL, если элемент не определен)."
+		<< endl;
+	int array[] = {3, 5, 1, 0, 3, 13, 1, 17};
+	int arraySize = sizeof array / sizeof array[0];
+	for (int i = 0; i < arraySize; i++) cout << array[i] << " | ";
+	cout << endl;
+	int* pMin = byAddressStaticArray(array, arraySize);
+	if (pMin) cout << "Минимальный элемент: " << *pMin << " по адресу: " << pMin << endl;
+	else cout << "Минимальный элемент не найден." << endl;
 	system("pause");
 }
 
@@ -81,4 +93,14 @@ void byReference(int& a, int b, int c)
 		max = c;
 	}
 	a = max;
+}
+
+int* byAddressStaticArray(int *array, int arraySize)
+{
+	int *pMin = &array[0];
+	for (int i = 0; i < arraySize - 1; i++)
+	{
+		if (array[i + 1] < *pMin) pMin = &array[i + 1];
+	}
+	return pMin ? pMin : NULL;
 }
