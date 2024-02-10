@@ -6,6 +6,7 @@ using namespace std;
 
 void noArguments();
 bool byValue(int, int);
+void byReference(int&, int, int);
 
 void main()
 {
@@ -17,11 +18,24 @@ void main()
 
 	cout << "\nФункция 2 принимает аргументы (по значению)" << endl;
 	cout << "Введите два числа" << endl;
-	int a;
-	int b;
+	int a{};
+	int b{};
+	int c{};
 	cin >> a >> b;
 	cout << "Проверить, имеют ли два аргумента разные знаки: "
-		<< (byValue(a, b) ? "Да" : "Нет") << endl;
+		<< (byValue(a, b) ? "Да" : "Нет") << endl;	
+
+	cout << "\nФункция 3 получает аргументы, "
+		<< "вычисляет значение выражения "
+		<< "и значение первого аргумента заменяет на полученный результат(по ссылке)."
+		<< endl;
+	cout << "Введите три числа" << endl;
+	cin >> a >> b >> c;
+	cout << "Начальное значение первого аргумента: " << a << endl;
+	byReference(a, b, c);
+	cout << "Максимум из 3-х чисел: " << a << endl;
+	cout << "Конечное значение первого аргумента: " << a << endl;
+
 
 	system("pause");
 }
@@ -53,4 +67,18 @@ bool byValue(int a, int b) {
 	*/
 
 	return (a < 0 || b < 0) && !(a < 0 && b < 0);
+}
+
+void byReference(int& a, int b, int c)
+{
+	int max{ a };
+	if (b > max)
+	{
+		max = b;
+	}
+	if (c > max)
+	{
+		max = c;
+	}
+	a = max;
 }
