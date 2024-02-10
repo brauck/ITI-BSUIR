@@ -37,10 +37,11 @@ void main()
 		printf("\n");
 	}
 
+	bool isNegative{};
 	printf("\nПоложительные строки:\n\n");	
 	for (int i = 0; i < 10; i++)
 	{   
-		bool isNegative = false;		
+		isNegative = false;		
 		for (int j = 0; j < 10; j++)
 		{
 			if (array[i][j] < 0)
