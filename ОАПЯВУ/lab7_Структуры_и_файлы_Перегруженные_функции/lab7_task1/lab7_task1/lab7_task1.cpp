@@ -16,25 +16,16 @@ struct Circle
 
 struct Cube
 {
-	double x1, y1, z1,
-	       x2, y2, z2,
-	       x3, y3, z3,
-	       x4, y4, z4,
-	       x5, y5, z5,
-	       x6, y6, z6,
-	       x7, y7, z7,
-	       x8, y8, z8;
-
 	double vertexes[8][3] =
 	{
-		{x1, y1, z1}, // A
-		{x2, y2, z2}, // B
-		{x3, y3, z3}, // C
-		{x4, y4, z4}, // D
-		{x5, y5, z5}, // E
-		{x6, y6, z6}, // F
-		{x7, y7, z7}, // G
-		{x8, y8, z8}  // H
+		{NULL, NULL, NULL}, // A
+		{NULL, NULL, NULL}, // B
+		{NULL, NULL, NULL}, // C
+		{NULL, NULL, NULL}, // D
+		{NULL, NULL, NULL}, // E
+		{NULL, NULL, NULL}, // F
+		{NULL, NULL, NULL}, // G
+		{NULL, NULL, NULL}  // H
 	};
 
 	bool isDefined{ false };
@@ -69,14 +60,13 @@ bool approximatelyEqualAbsRel(double a, double b, double absEpsilon, double relE
 	return diff <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * relEpsilon);
 }
 
-bool isFigure(Circle& circle)
+bool isFigure(const Circle& circle)
 {
 	if (circle.radius > 0) return true;
-	
+
 	cout << "Окружность не создана: "
 		<< "значение радиуса должно быть больше нуля" << endl;
-	system("pause");
-	circle.isDefined = false;
+	system("pause");	
 	return false;	
 }
 
@@ -89,7 +79,8 @@ double twoPointsDistance(int x1, int y1, int z1, int x2, int y2, int z2)
 	);
 }
 
-bool isCubeEdgesEqual(Cube& cube)
+// Проверка все ли ребра куба равны
+bool isCubeEdgesEqual(const Cube& cube)
 {	
 	// Ребро AB
 	double cubeEdgeLength = twoPointsDistance(
@@ -104,12 +95,11 @@ bool isCubeEdgesEqual(Cube& cube)
 	double tempCubeEdgeLength{};
 	bool isEdgesEqual{ true };
     int count{};
-	int offset{};
+	int offset{1};
 	
 	for (int i = 0; i < 8; i++)
 	{
 		// Ребра AB, BC, CD, EF, FG, GH
-		offset = 1;
 		tempCubeEdgeLength = twoPointsDistance(
 			cube.vertexes[i][0],
 			cube.vertexes[i][1],
@@ -118,7 +108,7 @@ bool isCubeEdgesEqual(Cube& cube)
 			cube.vertexes[i + offset][1],
 			cube.vertexes[i + offset][2]
 		);
-
+		cout << '\n' << tempCubeEdgeLength << ' ' << cubeEdgeLength << endl;
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
 			cubeEdgeLength,
@@ -126,16 +116,28 @@ bool isCubeEdgesEqual(Cube& cube)
 			relEpsilon)
 			)
 		{
+			cout << "in false" << endl;
 			isEdgesEqual = false;
 			break;
 		}
-
-		if (count < 3)
+	/*0 0 0
+	11 0 0
+	11 0 11
+	0 0 11
+	0 110 0
+	11 110 0
+	11 110 11
+	0 110 11*/
+		cout << "count: " << count << ' ' << "i: " << i << endl;
+		if (count < 2)
 		{
 			count++;
 			continue;
 		}
 
+		i++;
+		cout << "in AD" << endl;
+		cout << "count: " << count << ' ' << "i: " << i << endl;
 		// Ребра AD, EH
 		offset = -3;
 		tempCubeEdgeLength = twoPointsDistance(
@@ -146,6 +148,8 @@ bool isCubeEdgesEqual(Cube& cube)
 			cube.vertexes[i + offset][1],
 			cube.vertexes[i + offset][2]
 		);
+
+		cout << '\n' << tempCubeEdgeLength << ' ' << cubeEdgeLength << endl;
 
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
@@ -158,6 +162,7 @@ bool isCubeEdgesEqual(Cube& cube)
 			break;
 		}
 		count = 0;
+		offset = 1;
 	}
 
 	// Ребра AE, BF, CG, DH
@@ -172,7 +177,8 @@ bool isCubeEdgesEqual(Cube& cube)
 			cube.vertexes[i + offset][1],
 			cube.vertexes[i + offset][2]
 		);
-
+		cout << "i: " << i << endl;
+		cout << '\n' << tempCubeEdgeLength << ' ' << cubeEdgeLength << endl;
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
 			cubeEdgeLength,
@@ -186,14 +192,11 @@ bool isCubeEdgesEqual(Cube& cube)
 	}
 	
 	if (isEdgesEqual) return true;
-
-	cout << "Куб не создан: " << "все грани должны быть равны" << endl;
-	system("pause");
-	cube.isDefined = false;
 	return false;
 }
 
-bool isAllFacesSquares(Cube& cube)
+// Проверка все ли грани куба являются квадратами
+bool isAllFacesSquares(const Cube& cube)
 {
 	// Ребро AB
 	double cubeEdgeLength = twoPointsDistance(
@@ -209,15 +212,105 @@ bool isAllFacesSquares(Cube& cube)
 		2 * pow(cubeEdgeLength, 2)
 	);
 
-	for (int i = 0; i < 6; i++)
+	bool isDiagonalsEqual{ true };
+	double tempFaceDiagonal{};
+	int offset{5};
+	// Диагонали AF, BG, CH
+	for (int i = 0; i < 3; i++)
 	{
+		tempFaceDiagonal = twoPointsDistance(
+			cube.vertexes[i][0],
+			cube.vertexes[i][1],
+			cube.vertexes[i][2],
+			cube.vertexes[i + offset][0],
+			cube.vertexes[i + offset][1],
+			cube.vertexes[i + offset][2]
+		);
 
+		cout << '\n' << tempFaceDiagonal << ' ' << isoscelesRightTriangleHypotenuse << endl;
+		if (!approximatelyEqualAbsRel(
+			tempFaceDiagonal,
+			isoscelesRightTriangleHypotenuse,
+			absEpsilon,
+			relEpsilon)
+			)
+		{
+			isDiagonalsEqual = false;
+			break;
+		}
 	}
-	//diagonal
+
+	// грань DE
+	tempFaceDiagonal = twoPointsDistance(
+		cube.vertexes[3][0],
+		cube.vertexes[3][1],
+		cube.vertexes[3][2],
+		cube.vertexes[4][0],
+		cube.vertexes[4][1],
+		cube.vertexes[4][2]
+	);
+
+	if (!approximatelyEqualAbsRel(
+		tempFaceDiagonal,
+		isoscelesRightTriangleHypotenuse,
+		absEpsilon,
+		relEpsilon)
+		)
+	{
+		isDiagonalsEqual = false;
+	}
+	
+	// Диагонали AC, EG
+	offset = 2;	
+	for (int i = 0; i < 5; i +=4)
+	{
+		tempFaceDiagonal = twoPointsDistance(
+			cube.vertexes[i][0],
+			cube.vertexes[i][1],
+			cube.vertexes[i][2],
+			cube.vertexes[i + offset][0],
+			cube.vertexes[i + offset][1],
+			cube.vertexes[i + offset][2]
+		);
+
+		if (!approximatelyEqualAbsRel(
+			tempFaceDiagonal,
+			isoscelesRightTriangleHypotenuse,
+			absEpsilon,
+			relEpsilon)
+			)
+		{
+			isDiagonalsEqual = false;
+			break;
+		}
+	}
+
+	if (isDiagonalsEqual) return true;
+	return false;
+}
+
+bool isFigure(const Cube& cube)
+{
+	if (!isCubeEdgesEqual(cube))
+	{
+		cout << "Куб не создан: " << "все ребра должны быть равны" << endl;
+		system("pause");
+		return false;
+	}
+
+	if (!isAllFacesSquares(cube))
+	{
+		cout << "Куб не создан: " << "все грани должны быть квадратами" << endl;
+		system("pause");		
+		return false;
+	}
+
+	return true;
 }
 
 void createFigure(Circle& circle)
 {
+	circle.isDefined = false;
 	cout << "Введите координаты центра окружности (x y): ";
 	cin >> circle.x1 >> circle.y1;
 	cout << "Введите радиус: ";
@@ -228,28 +321,37 @@ void createFigure(Circle& circle)
 
 void createFigure(Cube& cube)
 {
+	/*0 0 0
+	11 0 0
+	11 0 11
+	0 0 11
+	0 11 0
+	11 11 0
+	11 11 11
+	0 11 11*/
+
+
+	cube.isDefined = false;
+
 	drawCube();
 	char vertex{ 'A' };
-	cout << "Введите координаты вершины " << vertex++ << "(x y z): ";
-	cin >> cube.x1 >> cube.y1 >> cube.z1;
-	cout << "Введите координаты вершины " << vertex++ << "(x y z): ";
-	cin >> cube.x2 >> cube.y2 >> cube.z2;
-	cout << "Введите координаты вершины " << vertex++ << "(x y z): ";
-	cin >> cube.x3 >> cube.y3 >> cube.z3;
-	cout << "Введите координаты вершины " << vertex++ << "(x y z): ";
-	cin >> cube.x4 >> cube.y4 >> cube.z4;
-	cout << "Введите координаты вершины " << vertex++ << "(x y z): ";
-	cin >> cube.x5 >> cube.y5 >> cube.z5;
-	cout << "Введите координаты вершины " << vertex++ << "(x y z): ";
-	cin >> cube.x6 >> cube.y6 >> cube.z6;
-	cout << "Введите координаты вершины " << vertex++ << "(x y z): ";
-	cin >> cube.x7 >> cube.y7 >> cube.z7;
-	cout << "Введите координаты вершины " << vertex << "(x y z): ";
-	cin >> cube.x8 >> cube.y8 >> cube.z8;
+	for (int i = 0; i < 8; i++)
+	{
+		cout << "Введите координаты вершины " << vertex++ << " (x y z): ";
+		cin >> cube.vertexes[i][0] >> cube.vertexes[i][1] >> cube.vertexes[i][2];
+	}
 
-	cube.isDefined = true;
+	/*for (int i = 0; i < 8; i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			cout << cube.vertexes[i][j] << ' ';
+		}
+	}*/
 
-	//system("pause");
+	if (isFigure(cube))  cube.isDefined = true;
+
+	system("pause");
 }
 
 void setFigure()
