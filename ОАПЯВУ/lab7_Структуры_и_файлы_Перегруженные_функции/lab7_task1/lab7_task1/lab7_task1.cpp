@@ -10,7 +10,7 @@ const int MAX = 20;
 
 struct Circle
 {
-	int x1, y1, radius;
+	int x, y, radius;
 	bool isDefined{ false };
 };
 
@@ -27,13 +27,13 @@ struct Cube
 		{NULL, NULL, NULL}, // G
 		{NULL, NULL, NULL}  // H
 	};
-
+	double edgeLength;
 	bool isDefined{ false };
 };
 
 void drawCube()
 {
-	printf("\n%25s\n", "    H-------------G");
+	printf("%25s\n", "      H-------------G");
 	printf("%25s\n", "     /'            /|");
 	printf("%25s\n", "    / '           / |");
 	printf("%25s\n", "   /  '          /  |");
@@ -82,16 +82,6 @@ double twoPointsDistance(int x1, int y1, int z1, int x2, int y2, int z2)
 // Проверка все ли ребра куба равны
 bool isCubeEdgesEqual(const Cube& cube)
 {	
-	// Ребро AB
-	double cubeEdgeLength = twoPointsDistance(
-		cube.vertexes[0][0],
-		cube.vertexes[0][1],
-		cube.vertexes[0][2],
-		cube.vertexes[1][0],
-		cube.vertexes[1][1],
-		cube.vertexes[1][2]
-	);
-
 	double tempCubeEdgeLength{};
 	bool isEdgesEqual{ true };
     int count{};
@@ -108,10 +98,10 @@ bool isCubeEdgesEqual(const Cube& cube)
 			cube.vertexes[i + offset][1],
 			cube.vertexes[i + offset][2]
 		);
-		cout << '\n' << tempCubeEdgeLength << ' ' << cubeEdgeLength << endl;
+		cout << '\n' << tempCubeEdgeLength << ' ' << cube.edgeLength << endl;
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
-			cubeEdgeLength,
+			cube.edgeLength,
 			absEpsilon,
 			relEpsilon)
 			)
@@ -149,11 +139,11 @@ bool isCubeEdgesEqual(const Cube& cube)
 			cube.vertexes[i + offset][2]
 		);
 
-		cout << '\n' << tempCubeEdgeLength << ' ' << cubeEdgeLength << endl;
+		cout << '\n' << tempCubeEdgeLength << ' ' << cube.edgeLength << endl;
 
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
-			cubeEdgeLength,
+			cube.edgeLength,
 			absEpsilon,
 			relEpsilon)
 			)
@@ -178,10 +168,10 @@ bool isCubeEdgesEqual(const Cube& cube)
 			cube.vertexes[i + offset][2]
 		);
 		cout << "i: " << i << endl;
-		cout << '\n' << tempCubeEdgeLength << ' ' << cubeEdgeLength << endl;
+		cout << '\n' << tempCubeEdgeLength << ' ' << cube.edgeLength << endl;
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
-			cubeEdgeLength,
+			cube.edgeLength,
 			absEpsilon,
 			relEpsilon)
 			)
@@ -198,18 +188,8 @@ bool isCubeEdgesEqual(const Cube& cube)
 // Проверка все ли грани куба являются квадратами
 bool isAllFacesSquares(const Cube& cube)
 {
-	// Ребро AB
-	double cubeEdgeLength = twoPointsDistance(
-		cube.vertexes[0][0],
-		cube.vertexes[0][1],
-		cube.vertexes[0][2],
-		cube.vertexes[1][0],
-		cube.vertexes[1][1],
-		cube.vertexes[1][2]
-	);
-
 	double isoscelesRightTriangleHypotenuse = sqrt(
-		2 * pow(cubeEdgeLength, 2)
+		2 * pow(cube.edgeLength, 2)
 	);
 
 	bool isDiagonalsEqual{ true };
@@ -312,7 +292,7 @@ void createFigure(Circle& circle)
 {
 	circle.isDefined = false;
 	cout << "Введите координаты центра окружности (x y): ";
-	cin >> circle.x1 >> circle.y1;
+	cin >> circle.x >> circle.y;
 	cout << "Введите радиус: ";
 	cin >> circle.radius;
 	
@@ -332,14 +312,23 @@ void createFigure(Cube& cube)
 
 
 	cube.isDefined = false;
-
-	drawCube();
 	char vertex{ 'A' };
+	drawCube();	
 	for (int i = 0; i < 8; i++)
 	{
 		cout << "Введите координаты вершины " << vertex++ << " (x y z): ";
 		cin >> cube.vertexes[i][0] >> cube.vertexes[i][1] >> cube.vertexes[i][2];
 	}
+
+	// Ребро AB
+	cube.edgeLength = twoPointsDistance(
+		cube.vertexes[0][0],
+		cube.vertexes[0][1],
+		cube.vertexes[0][2],
+		cube.vertexes[1][0],
+		cube.vertexes[1][1],
+		cube.vertexes[1][2]
+	);
 
 	/*for (int i = 0; i < 8; i++)
 	{
@@ -354,6 +343,94 @@ void createFigure(Cube& cube)
 	system("pause");
 }
 
+double perimeter(const Circle& circle)
+{
+	return 2 * M_PI * circle.radius;
+}
+
+double perimeter(const Cube& cube)
+{
+	return cube.edgeLength * 12;
+}
+
+double square(const Circle& circle)
+{
+	return M_PI * pow(circle.radius, 2);
+}
+
+double square(const Cube& cube)
+{
+	return pow(cube.edgeLength, 2) * 6;
+}
+
+double volume(const Cube& cube)
+{
+	return pow(cube.edgeLength, 3);
+}
+
+void info(const Circle& circle)
+{
+	if (!circle.isDefined)
+	{
+		cout << "Окружность неопределена" << endl;
+		cout << "Создайте окружность" << endl;
+		system("pause");
+		return;
+	}
+	cout << "Координаты центра окружности: "
+		<< '(' << circle.x << ", " << circle.y << ')' << endl;
+	cout << "Радиус окружности: " << circle.radius << endl;
+	cout << "Длина окружности: " << perimeter(circle) << endl;
+	cout << "Площадь круга: " << square(circle) << endl;
+
+	system("pause");
+}
+
+void info(const Cube& cube)
+{
+	drawCube();
+	char vertex = 'A';
+	cout << "Координаты вершин куба: " << endl;	
+	for (int i = 0; i < 8; i++)
+	{
+		cout << "Координаты вершины " << vertex++ << ": ";
+	    cout << '(' << cube.vertexes[i][0] << ", "
+			<< cube.vertexes[i][1] << ", "
+			<< cube.vertexes[i][2] << ')';
+		cout << endl;
+	}
+
+	cout << "Длина ребра куба: " << cube.edgeLength << endl;
+	cout << "Периметр ребер куба: " << perimeter(cube) << endl;
+	cout << "Площадь куба: " << square(cube) << endl;
+	cout << "Объем куба: " << volume(cube) << endl;
+
+	system("pause");
+}
+
+void showInfo()
+{
+	while (true)
+	{
+		system("cls");
+		printf("1. Получить информацию об окружности\n");
+		printf("2. Получить информацию о кубе\n");
+		printf("0. В главное меню\n");
+
+		char menu[80];
+		cin >> menu;
+		switch (menu[0])
+		{
+		case '1': info(circle); break;
+		case '2': info(cube); break;
+		case '0': return;
+		default:
+			printf("Неправильный пункт меню\n");
+			system("pause");
+		}
+	}
+}
+
 void setFigure()
 {
 	while (true)
@@ -361,7 +438,7 @@ void setFigure()
 		system("cls");
 		printf("1. Создать окружность\n");
 		printf("2. Создать куб\n");
-		printf("0. Выход\n");
+		printf("0. В главное меню\n");
 		
 		char menu[80];
 		cin >> menu;
@@ -375,17 +452,6 @@ void setFigure()
 			system("pause");
 		}
 	}
-
-}
-
-void getPerimeter()
-{
-
-}
-
-void showInfo()
-{
-
 }
 
 void save()
@@ -413,24 +479,18 @@ int main()
 		printf("Главное меню\n");
 		printf("****************\n");
 		printf("1. Ввести значения фигур\n");
-		printf("2. Расчет периметра\n");
-		printf("3. Расчет площади\n");
-		printf("4. Расчет объема\n");
-		printf("5. Вывод информации о фигуре\n");
-		printf("6. Сохранение структуры в файл\n");
-		printf("7. Чтение структуры из файла\n");
+		printf("2. Вывод информации о фигуре\n");
+		printf("3. Сохранение структуры в файл\n");
+		printf("4. Чтение структуры из файла\n");
 		printf("0. Выход\n");
 		char menu[80];
 		cin >> menu;
 		switch (menu[0])
 		{
 		case '1': setFigure(); break;
-		case '2': getPerimeter(); break;
-		case '3': break;
-		case '4': break;
-		case '5': showInfo(); break;
-		case '6': save(); break;
-		case '7': load(); break;
+		case '2': showInfo(); break;
+		case '3': save(); break;
+		case '4': load(); break;
 		case '0':
 			system("pause");
 			return 0;
