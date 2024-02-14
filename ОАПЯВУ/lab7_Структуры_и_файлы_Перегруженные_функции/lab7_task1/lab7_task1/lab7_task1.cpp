@@ -110,15 +110,7 @@ bool isCubeEdgesEqual(const Cube& cube)
 			isEdgesEqual = false;
 			break;
 		}
-	/*0 0 0
-	11 0 0
-	11 0 11
-	0 0 11
-	0 110 0
-	11 110 0
-	11 110 11
-	0 110 11*/
-		cout << "count: " << count << ' ' << "i: " << i << endl;
+	
 		if (count < 2)
 		{
 			count++;
@@ -126,8 +118,7 @@ bool isCubeEdgesEqual(const Cube& cube)
 		}
 
 		i++;
-		cout << "in AD" << endl;
-		cout << "count: " << count << ' ' << "i: " << i << endl;
+
 		// Ребра AD, EH
 		offset = -3;
 		tempCubeEdgeLength = twoPointsDistance(
@@ -138,8 +129,6 @@ bool isCubeEdgesEqual(const Cube& cube)
 			cube.vertexes[i + offset][1],
 			cube.vertexes[i + offset][2]
 		);
-
-		cout << '\n' << tempCubeEdgeLength << ' ' << cube.edgeLength << endl;
 
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
@@ -167,8 +156,7 @@ bool isCubeEdgesEqual(const Cube& cube)
 			cube.vertexes[i + offset][1],
 			cube.vertexes[i + offset][2]
 		);
-		cout << "i: " << i << endl;
-		cout << '\n' << tempCubeEdgeLength << ' ' << cube.edgeLength << endl;
+
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
 			cube.edgeLength,
@@ -207,7 +195,6 @@ bool isAllFacesSquares(const Cube& cube)
 			cube.vertexes[i + offset][2]
 		);
 
-		cout << '\n' << tempFaceDiagonal << ' ' << isoscelesRightTriangleHypotenuse << endl;
 		if (!approximatelyEqualAbsRel(
 			tempFaceDiagonal,
 			isoscelesRightTriangleHypotenuse,
@@ -310,6 +297,14 @@ void createFigure(Cube& cube)
 	11 11 11
 	0 11 11*/
 
+	/*0 0 0
+	11 0 0
+	11 0 11
+	0 0 11
+	0 110 0
+	11 110 0
+	11 110 11
+	0 110 11*/
 
 	cube.isDefined = false;
 	char vertex{ 'A' };
@@ -330,17 +325,7 @@ void createFigure(Cube& cube)
 		cube.vertexes[1][2]
 	);
 
-	/*for (int i = 0; i < 8; i++)
-	{
-		for (int j = 0; j < 3; j++)
-		{
-			cout << cube.vertexes[i][j] << ' ';
-		}
-	}*/
-
 	if (isFigure(cube))  cube.isDefined = true;
-
-	system("pause");
 }
 
 double perimeter(const Circle& circle)
@@ -388,6 +373,13 @@ void info(const Circle& circle)
 
 void info(const Cube& cube)
 {
+	if (!cube.isDefined)
+	{
+		cout << "Куб неопределен" << endl;
+		cout << "Создайте куб" << endl;
+		system("pause");
+		return;
+	}
 	drawCube();
 	char vertex = 'A';
 	cout << "Координаты вершин куба: " << endl;	
@@ -464,18 +456,17 @@ void load()
 
 }
 
-
 int main()
 {
 	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
+	SetConsoleOutputCP(1251);	
 
-	
+	/*cout << sizeof cube << endl;
+	system("pause");*/
 
 	while (true)
 	{
 		system("cls");
-		printf("****************\n");
 		printf("Главное меню\n");
 		printf("****************\n");
 		printf("1. Ввести значения фигур\n");
