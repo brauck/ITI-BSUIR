@@ -65,6 +65,7 @@ BenchmarkDotNet.Artifacts
 555*
 666*
 777*
+cube_test*
 string.txt
 **/x64/
 *.vcxproj*

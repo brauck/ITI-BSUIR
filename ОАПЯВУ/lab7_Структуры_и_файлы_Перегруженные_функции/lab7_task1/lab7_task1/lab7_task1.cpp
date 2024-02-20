@@ -46,9 +46,6 @@ void drawCube()
 	printf("%25s\n\n", "A-------------B    ");
 }
 
-//Circle circle;
-//Cube cube;
-
 double absEpsilon{ 1e-12 };
 double relEpsilon{ 1e-8 };
 bool approximatelyEqualAbsRel(double a, double b, double absEpsilon, double relEpsilon)
@@ -70,7 +67,9 @@ bool isFigure(const Circle& circle)
 	return false;	
 }
 
-double twoPointsDistance(int x1, int y1, int z1, int x2, int y2, int z2)
+double twoPointsDistance(
+	double x1, double y1, double z1,
+	double x2, double y2, double z2)
 {
 	return sqrt(
 		pow(x2 - x1, 2) +
@@ -98,7 +97,7 @@ bool isCubeEdgesEqual(const Cube& cube)
 			cube.vertexes[i + offset][1],
 			cube.vertexes[i + offset][2]
 		);
-		cout << '\n' << tempCubeEdgeLength << ' ' << cube.edgeLength << endl;
+
 		if (!approximatelyEqualAbsRel(
 			tempCubeEdgeLength,
 			cube.edgeLength,
@@ -106,7 +105,6 @@ bool isCubeEdgesEqual(const Cube& cube)
 			relEpsilon)
 			)
 		{
-			cout << "in false" << endl;
 			isEdgesEqual = false;
 			break;
 		}
@@ -183,6 +181,7 @@ bool isAllFacesSquares(const Cube& cube)
 	bool isDiagonalsEqual{ true };
 	double tempFaceDiagonal{};
 	int offset{5};
+
 	// Диагонали AF, BG, CH
 	for (int i = 0; i < 3; i++)
 	{
@@ -207,7 +206,7 @@ bool isAllFacesSquares(const Cube& cube)
 		}
 	}
 
-	// грань DE
+	// Диагональ DE
 	tempFaceDiagonal = twoPointsDistance(
 		cube.vertexes[3][0],
 		cube.vertexes[3][1],
@@ -283,29 +282,16 @@ void createFigure(Circle& circle)
 	cout << "Введите радиус: ";
 	cin >> circle.radius;
 	
-	if (isFigure(circle)) circle.isDefined = true;
+	if (isFigure(circle))
+	{
+		circle.isDefined = true;
+		cout << "Окружность создана" << endl;
+		system("pause");
+	}
 }
 
 void createFigure(Cube& cube)
 {
-	/*0 0 0
-	11 0 0
-	11 0 11
-	0 0 11
-	0 11 0
-	11 11 0
-	11 11 11
-	0 11 11*/
-
-	/*0 0 0
-	11 0 0
-	11 0 11
-	0 0 11
-	0 110 0
-	11 110 0
-	11 110 11
-	0 110 11*/
-
 	cube.isDefined = false;
 	char vertex{ 'A' };
 	drawCube();	
@@ -325,7 +311,12 @@ void createFigure(Cube& cube)
 		cube.vertexes[1][2]
 	);
 
-	if (isFigure(cube))  cube.isDefined = true;
+	if (isFigure(cube))
+	{
+		cube.isDefined = true;
+		cout << "Куб создан" << endl;
+		system("pause");
+	}
 }
 
 double perimeter(const Circle& circle)
@@ -381,7 +372,7 @@ void info(const Cube& cube)
 		return;
 	}
 	drawCube();
-	char vertex = 'A';
+	char vertex{ 'A' };
 	cout << "Координаты вершин куба: " << endl;	
 	for (int i = 0; i < 8; i++)
 	{
@@ -436,8 +427,8 @@ void setFigure()
 		cin >> menu;
 		switch (menu[0])
 		{
-		case '1': createFigure(circle); return;
-		case '2': createFigure(cube); return;
+		case '1': createFigure(circle); break;
+		case '2': createFigure(cube); break;
 		case '0': return;
 		default:
 			printf("Неправильный пункт меню\n");
@@ -446,15 +437,11 @@ void setFigure()
 	}
 }
 
-void save(Circle& circle)
-{
-	printf("Выбранная фигура: окружность\n");
-	cout << "Введите имя файла для сохранения (без .bin): ";
+void saveCircle(char* filename)
+{	
 	char* b{ nullptr };
 	FILE* file;
-	char filename[100];	
-	cin >> filename;
-	strcat_s(filename, 100, ".bin");
+	
 	if (fopen_s(&file, filename, "wb"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
@@ -490,15 +477,11 @@ void save(Circle& circle)
 	system("pause");
 }
 
-void save(Cube& cube)
+void saveCube(char* filename)
 {
-	printf("Выбранная фигура: куб\n");
-	cout << "Введите имя файла для сохранения (без .bin): ";
 	char* b{ nullptr };
 	FILE* file;
-	char filename[100];
-	cin >> filename;
-	strcat_s(filename, 100, ".bin");
+
 	if (fopen_s(&file, filename, "wb"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
@@ -508,7 +491,6 @@ void save(Cube& cube)
 
 	if (cube.isDefined)
 	{
-		printf("Выбранная фигура: куб\n");
 		b = (char*)&cube;
 
 		for (int i = 0; i < sizeof(cube); i++)
@@ -537,6 +519,8 @@ void save(Cube& cube)
 
 void save()
 {
+	char filename[100];
+
 	while (true)
 	{
 		system("cls");
@@ -548,8 +532,20 @@ void save()
 		cin >> menu;
 		switch (menu[0])
 		{
-		case '1': save(circle); return;
-		case '2': save(cube); return;
+		case '1':
+			printf("Выбранная фигура: окружность\n");
+			printf("Введите имя файла для сохранения (без .bin): ");
+			cin >> filename;
+			strcat_s(filename, 100, ".bin");
+			saveCircle(filename);
+			return;
+		case '2':
+			printf("Выбранная фигура: куб\n");
+			cout << "Введите имя файла для сохранения (без .bin): ";
+			cin >> filename;
+			strcat_s(filename, 100, ".bin");
+			saveCube(filename);
+			return;
 		case '0': return;
 		default:
 			printf("Неправильный пункт меню\n");
@@ -558,15 +554,10 @@ void save()
 	}	
 }
 
-void load(Circle& circle)
+void load(char* filename, Circle& circle)
 {
-	FILE* file;
-	char filename[100];
-
-	printf("Выбранная фигура: окружность\n");
-	cout << "Введите имя файла для загрузки (без .bin): ";
-	cin >> filename;
-	strcat_s(filename, 100, ".bin");
+	FILE* file;	
+	
 	if (fopen_s(&file, filename, "rb"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
@@ -579,6 +570,10 @@ void load(Circle& circle)
 	if (circle.isDefined)
 	{		
 		printf("Данные загружены\n");
+		if (fclose(file))
+		{
+			cout << "Ошибка закрытия файла: " << filename << endl;
+		}
 		system("pause");
 		return;
 	}
@@ -593,15 +588,10 @@ void load(Circle& circle)
 	system("pause");
 }
 
-void load(Cube& cube)
+void load(char* filename, Cube& cube)
 {
 	FILE* file;
-	char filename[100];
-
-	printf("Выбранная фигура: куб\n");
-	cout << "Введите имя файла для загрузки (без .bin): ";
-	cin >> filename;
-	strcat_s(filename, 100, ".bin");
+	
 	if (fopen_s(&file, filename, "rb"))
 	{
 		cout << "Ошибка открытия файла: " << filename << endl;
@@ -614,6 +604,10 @@ void load(Cube& cube)
 	if (cube.isDefined)
 	{
 		printf("Данные загружены\n");
+		if (fclose(file))
+		{
+			cout << "Ошибка закрытия файла: " << filename << endl;
+		}
 		system("pause");
 		return;
 	}
@@ -630,6 +624,8 @@ void load(Cube& cube)
 
 void load()
 {
+	char filename[100];
+
 	while (true)
 	{
 		system("cls");
@@ -641,8 +637,20 @@ void load()
 		cin >> menu;
 		switch (menu[0])
 		{
-		case '1': load(circle); return;
-		case '2': load(cube); return;
+		case '1':
+			printf("Выбранная фигура: окружность\n");
+			cout << "Введите имя файла для загрузки (без .bin): ";
+			cin >> filename;
+			strcat_s(filename, 100, ".bin");
+			load(filename, circle);
+			return;
+		case '2':
+			printf("Выбранная фигура: куб\n");
+			cout << "Введите имя файла для загрузки (без .bin): ";
+			cin >> filename;
+			strcat_s(filename, 100, ".bin");
+			load(filename, cube);
+			return;
 		case '0': return;
 		default:
 			printf("Неправильный пункт меню\n");
@@ -654,10 +662,7 @@ void load()
 int main()
 {
 	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);	
-
-	/*cout << sizeof cube << endl;
-	system("pause");*/
+	SetConsoleOutputCP(1251);
 
 	while (true)
 	{
