@@ -12,7 +12,7 @@ struct Circle
 {
 	int x, y, radius;
 	bool isDefined{ false };
-};
+} circle;
 
 struct Cube
 {
@@ -29,7 +29,7 @@ struct Cube
 	};
 	double edgeLength;
 	bool isDefined{ false };
-};
+} cube;
 
 void drawCube()
 {
@@ -46,8 +46,8 @@ void drawCube()
 	printf("%25s\n\n", "A-------------B    ");
 }
 
-Circle circle;
-Cube cube;
+//Circle circle;
+//Cube cube;
 
 double absEpsilon{ 1e-12 };
 double relEpsilon{ 1e-8 };
@@ -446,14 +446,209 @@ void setFigure()
 	}
 }
 
+void save(Circle& circle)
+{
+	printf("Выбранная фигура: окружность\n");
+	cout << "Введите имя файла для сохранения (без .bin): ";
+	char* b{ nullptr };
+	FILE* file;
+	char filename[100];	
+	cin >> filename;
+	strcat_s(filename, 100, ".bin");
+	if (fopen_s(&file, filename, "wb"))
+	{
+		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
+		return;
+	}
+
+	if (circle.isDefined)
+	{
+		b = (char*)&circle;
+
+		for (int i = 0; i < sizeof(circle); i++)
+		{
+			fputc(*(b++), file);
+		}
+		printf("Данные сохранены\n");
+
+		if (fclose(file))
+		{
+			cout << "Ошибка закрытия файла: " << filename << endl;
+		}
+		system("pause");
+		return;
+	}
+	else
+	{
+		printf("Структура окружности не вводилась\n");
+	}
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
+	system("pause");
+}
+
+void save(Cube& cube)
+{
+	printf("Выбранная фигура: куб\n");
+	cout << "Введите имя файла для сохранения (без .bin): ";
+	char* b{ nullptr };
+	FILE* file;
+	char filename[100];
+	cin >> filename;
+	strcat_s(filename, 100, ".bin");
+	if (fopen_s(&file, filename, "wb"))
+	{
+		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
+		return;
+	}
+
+	if (cube.isDefined)
+	{
+		printf("Выбранная фигура: куб\n");
+		b = (char*)&cube;
+
+		for (int i = 0; i < sizeof(cube); i++)
+		{
+			fputc(*(b++), file);
+		}
+		printf("Данные сохранены\n");
+
+		if (fclose(file))
+		{
+			cout << "Ошибка закрытия файла: " << filename << endl;
+		}
+		system("pause");
+		return;
+	}
+	else
+	{
+		printf("Структура куба не вводилась\n");
+	}
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
+	system("pause");
+}
+
 void save()
 {
+	while (true)
+	{
+		system("cls");
+		printf("1. Сохранить окружность\n");
+		printf("2. Сохранить куб\n");
+		printf("0. В главное меню\n\n");
+		
+		char menu[80];
+		cin >> menu;
+		switch (menu[0])
+		{
+		case '1': save(circle); return;
+		case '2': save(cube); return;
+		case '0': return;
+		default:
+			printf("Неправильный пункт меню\n");
+			system("pause");
+		}
+	}	
+}
 
+void load(Circle& circle)
+{
+	FILE* file;
+	char filename[100];
+
+	printf("Выбранная фигура: окружность\n");
+	cout << "Введите имя файла для загрузки (без .bin): ";
+	cin >> filename;
+	strcat_s(filename, 100, ".bin");
+	if (fopen_s(&file, filename, "rb"))
+	{
+		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
+		return;
+	}
+
+	fread_s(&circle, sizeof(circle), sizeof(circle), 1, file);
+
+	if (circle.isDefined)
+	{		
+		printf("Данные загружены\n");
+		system("pause");
+		return;
+	}
+	else
+	{
+		printf("Структура окружности не вводилась\n");
+	}
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
+	system("pause");
+}
+
+void load(Cube& cube)
+{
+	FILE* file;
+	char filename[100];
+
+	printf("Выбранная фигура: куб\n");
+	cout << "Введите имя файла для загрузки (без .bin): ";
+	cin >> filename;
+	strcat_s(filename, 100, ".bin");
+	if (fopen_s(&file, filename, "rb"))
+	{
+		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
+		return;
+	}
+
+	fread_s(&cube, sizeof(cube), sizeof(cube), 1, file);
+
+	if (cube.isDefined)
+	{
+		printf("Данные загружены\n");
+		system("pause");
+		return;
+	}
+	else
+	{
+		printf("Структура куба не вводилась\n");
+	}
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
+	system("pause");
 }
 
 void load()
 {
+	while (true)
+	{
+		system("cls");
+		printf("1. Загрузить окружность\n");
+		printf("2. Загрузить куб\n");
+		printf("0. В главное меню\n\n");
 
+		char menu[80];
+		cin >> menu;
+		switch (menu[0])
+		{
+		case '1': load(circle); return;
+		case '2': load(cube); return;
+		case '0': return;
+		default:
+			printf("Неправильный пункт меню\n");
+			system("pause");
+		}
+	}
 }
 
 int main()

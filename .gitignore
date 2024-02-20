@@ -62,8 +62,9 @@ BenchmarkDotNet.Artifacts
 *.pfx
 
 # CPP
-555
-666
+555*
+666*
+777*
 string.txt
 **/x64/
 *.vcxproj*
