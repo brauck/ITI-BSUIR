@@ -6,11 +6,9 @@
 #include <Windows.h>
 using namespace std;
 
-const int MAX = 20;
-
 struct Circle
 {
-	int x, y, radius;
+	int x{}, y{}, radius{};
 	bool isDefined{ false };
 } circle;
 
@@ -27,7 +25,7 @@ struct Cube
 		{NULL, NULL, NULL}, // G
 		{NULL, NULL, NULL}  // H
 	};
-	double edgeLength;
+	double edgeLength{};
 	bool isDefined{ false };
 } cube;
 
@@ -48,6 +46,7 @@ void drawCube()
 
 double absEpsilon{ 1e-12 };
 double relEpsilon{ 1e-8 };
+// Функция для проверки равенства чисел сплавающей точкой
 bool approximatelyEqualAbsRel(double a, double b, double absEpsilon, double relEpsilon)
 {
 	double diff = fabs(a - b);
@@ -57,11 +56,12 @@ bool approximatelyEqualAbsRel(double a, double b, double absEpsilon, double relE
 	return diff <= ((fabs(a) < fabs(b) ? fabs(b) : fabs(a)) * relEpsilon);
 }
 
+// Проверка является ли создаваемая фигура окружностью
 bool isFigure(const Circle& circle)
 {
 	if (circle.radius > 0) return true;
 
-	cout << "Окружность не создана: "
+	cout << "\nОкружность не создана: "
 		<< "значение радиуса должно быть больше нуля" << endl;
 	system("pause");	
 	return false;	
@@ -82,7 +82,6 @@ double twoPointsDistance(
 bool isCubeEdgesEqual(const Cube& cube)
 {	
 	double tempCubeEdgeLength{};
-	bool isEdgesEqual{ true };
     int count{};
 	int offset{1};
 	
@@ -105,8 +104,7 @@ bool isCubeEdgesEqual(const Cube& cube)
 			relEpsilon)
 			)
 		{
-			isEdgesEqual = false;
-			break;
+			return false;
 		}
 	
 		if (count < 2)
@@ -117,7 +115,7 @@ bool isCubeEdgesEqual(const Cube& cube)
 
 		i++;
 
-		// Ребра AD, EH
+		// Ребра DA, HE
 		offset = -3;
 		tempCubeEdgeLength = twoPointsDistance(
 			cube.vertexes[i][0],
@@ -135,8 +133,7 @@ bool isCubeEdgesEqual(const Cube& cube)
 			relEpsilon)
 			)
 		{
-			isEdgesEqual = false;
-			break;
+			return false;
 		}
 		count = 0;
 		offset = 1;
@@ -162,13 +159,11 @@ bool isCubeEdgesEqual(const Cube& cube)
 			relEpsilon)
 			)
 		{
-			isEdgesEqual = false;
-			break;
+			return false;
 		}
 	}
 	
-	if (isEdgesEqual) return true;
-	return false;
+	return true;
 }
 
 // Проверка все ли грани куба являются квадратами
@@ -178,7 +173,6 @@ bool isAllFacesSquares(const Cube& cube)
 		2 * pow(cube.edgeLength, 2)
 	);
 
-	bool isDiagonalsEqual{ true };
 	double tempFaceDiagonal{};
 	int offset{5};
 
@@ -201,8 +195,7 @@ bool isAllFacesSquares(const Cube& cube)
 			relEpsilon)
 			)
 		{
-			isDiagonalsEqual = false;
-			break;
+			return false;
 		}
 	}
 
@@ -223,7 +216,7 @@ bool isAllFacesSquares(const Cube& cube)
 		relEpsilon)
 		)
 	{
-		isDiagonalsEqual = false;
+		return false;
 	}
 	
 	// Диагонали AC, EG
@@ -246,27 +239,26 @@ bool isAllFacesSquares(const Cube& cube)
 			relEpsilon)
 			)
 		{
-			isDiagonalsEqual = false;
-			break;
+			return false;
 		}
 	}
 
-	if (isDiagonalsEqual) return true;
-	return false;
+	return true;
 }
 
+// Проверка является ли создаваемая фигура кубом
 bool isFigure(const Cube& cube)
 {
 	if (!isCubeEdgesEqual(cube))
 	{
-		cout << "Куб не создан: " << "все ребра должны быть равны" << endl;
+		cout << "\nКуб не создан: " << "все ребра должны быть равны" << endl;
 		system("pause");
 		return false;
 	}
 
 	if (!isAllFacesSquares(cube))
 	{
-		cout << "Куб не создан: " << "все грани должны быть квадратами" << endl;
+		cout << "\nКуб не создан: " << "все грани должны быть квадратами" << endl;
 		system("pause");		
 		return false;
 	}
@@ -353,6 +345,7 @@ void info(const Circle& circle)
 		system("pause");
 		return;
 	}
+
 	cout << "Координаты центра окружности: "
 		<< '(' << circle.x << ", " << circle.y << ')' << endl;
 	cout << "Радиус окружности: " << circle.radius << endl;
@@ -371,6 +364,7 @@ void info(const Cube& cube)
 		system("pause");
 		return;
 	}
+
 	drawCube();
 	char vertex{ 'A' };
 	cout << "Координаты вершин куба: " << endl;	
@@ -448,31 +442,18 @@ void saveCircle(char* filename)
 		system("pause");
 		return;
 	}
+		
+	b = (char*)&circle;
 
-	if (circle.isDefined)
+	for (int i = 0; i < sizeof(circle); i++)
 	{
-		b = (char*)&circle;
-
-		for (int i = 0; i < sizeof(circle); i++)
-		{
-			fputc(*(b++), file);
-		}
-		printf("Данные сохранены\n");
-
-		if (fclose(file))
-		{
-			cout << "Ошибка закрытия файла: " << filename << endl;
-		}
-		system("pause");
-		return;
+		fputc(*(b++), file);
 	}
-	else
-	{
-		printf("Структура окружности не вводилась\n");
-	}
+	printf("Данные сохранены\n");
+
 	if (fclose(file))
 	{
-		cout << "Ошибка закрытия файла: " << filename << endl;
+		cout << "Ошибка закрытия файла: " << filename << endl;		
 	}
 	system("pause");
 }
@@ -489,30 +470,17 @@ void saveCube(char* filename)
 		return;
 	}
 
-	if (cube.isDefined)
-	{
-		b = (char*)&cube;
+	b = (char*)&cube;
 
-		for (int i = 0; i < sizeof(cube); i++)
-		{
-			fputc(*(b++), file);
-		}
-		printf("Данные сохранены\n");
-
-		if (fclose(file))
-		{
-			cout << "Ошибка закрытия файла: " << filename << endl;
-		}
-		system("pause");
-		return;
-	}
-	else
+	for (int i = 0; i < sizeof(cube); i++)
 	{
-		printf("Структура куба не вводилась\n");
+		fputc(*(b++), file);
 	}
+	printf("Данные сохранены\n");
+
 	if (fclose(file))
 	{
-		cout << "Ошибка закрытия файла: " << filename << endl;
+		cout << "Ошибка закрытия файла: " << filename << endl;		
 	}
 	system("pause");
 }
@@ -533,19 +501,33 @@ void save()
 		switch (menu[0])
 		{
 		case '1':
-			printf("Выбранная фигура: окружность\n");
-			printf("Введите имя файла для сохранения (без .bin): ");
-			cin >> filename;
-			strcat_s(filename, 100, ".bin");
-			saveCircle(filename);
-			return;
+			if (circle.isDefined)
+			{
+				printf("Выбранная фигура: окружность\n");
+				printf("Введите имя файла для сохранения (без .bin): ");
+				cin >> filename;
+				strcat_s(filename, 100, ".bin");
+				saveCircle(filename);
+				break;
+			}
+			printf("Структура окружности не вводилась\n");
+			system("pause");
+			break;
+			
 		case '2':
-			printf("Выбранная фигура: куб\n");
-			cout << "Введите имя файла для сохранения (без .bin): ";
-			cin >> filename;
-			strcat_s(filename, 100, ".bin");
-			saveCube(filename);
-			return;
+			if (cube.isDefined)
+			{
+				printf("Выбранная фигура: куб\n");
+				printf("Введите имя файла для сохранения (без .bin): ");
+				cin >> filename;
+				strcat_s(filename, 100, ".bin");
+				saveCube(filename);
+				break;
+			}			
+			printf("Структура куба не вводилась\n");
+			system("pause");
+			break;
+			
 		case '0': return;
 		default:
 			printf("Неправильный пункт меню\n");
@@ -556,6 +538,7 @@ void save()
 
 void load(char* filename, Circle& circle)
 {
+	circle.isDefined = false;
 	FILE* file;	
 	
 	if (fopen_s(&file, filename, "rb"))
@@ -577,10 +560,9 @@ void load(char* filename, Circle& circle)
 		system("pause");
 		return;
 	}
-	else
-	{
-		printf("Структура окружности не вводилась\n");
-	}
+	
+	printf("Файл не содержит структуру окружность\n");
+	
 	if (fclose(file))
 	{
 		cout << "Ошибка закрытия файла: " << filename << endl;
@@ -590,6 +572,7 @@ void load(char* filename, Circle& circle)
 
 void load(char* filename, Cube& cube)
 {
+	cube.isDefined = false;
 	FILE* file;
 	
 	if (fopen_s(&file, filename, "rb"))
@@ -611,10 +594,9 @@ void load(char* filename, Cube& cube)
 		system("pause");
 		return;
 	}
-	else
-	{
-		printf("Структура куба не вводилась\n");
-	}
+	
+	printf("Файл не содержит структуру куб\n");
+	
 	if (fclose(file))
 	{
 		cout << "Ошибка закрытия файла: " << filename << endl;
@@ -639,18 +621,18 @@ void load()
 		{
 		case '1':
 			printf("Выбранная фигура: окружность\n");
-			cout << "Введите имя файла для загрузки (без .bin): ";
+			printf("Введите имя файла для загрузки (без .bin): ");
 			cin >> filename;
 			strcat_s(filename, 100, ".bin");
 			load(filename, circle);
-			return;
+			break;
 		case '2':
 			printf("Выбранная фигура: куб\n");
-			cout << "Введите имя файла для загрузки (без .bin): ";
+			printf("Введите имя файла для загрузки (без .bin): ");
 			cin >> filename;
 			strcat_s(filename, 100, ".bin");
 			load(filename, cube);
-			return;
+			break;
 		case '0': return;
 		default:
 			printf("Неправильный пункт меню\n");
