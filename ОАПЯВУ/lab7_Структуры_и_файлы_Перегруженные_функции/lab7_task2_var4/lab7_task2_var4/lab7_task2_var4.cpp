@@ -8,26 +8,31 @@
 #include <Windows.h>
 #include <limits>
 #define _USE_MATH_DEFINES 
+#undef max
 using namespace std;
 
 const int MAX{ 20 };
-int ID{ 1 };
 int countDefinedEmployees{};
 
 struct Employee
 {
-	char lastName[30]{"sdfsfd"};
-	char name[30]{"kjkj"};
-	char patronymic[30]{"hjkl"};
-	int employeeID{11};
-	int workedHoursPerMonth{160};
-	int hourlyRate{10};
-	bool isDefined{true};
+	char lastName[30]{};
+	char name[30]{};
+	char patronymic[30]{};
+	int employeeID{};
+	int workedHoursPerMonth{};
+	int hourlyRate{};
+	bool isDefined{};
 };
 
+
+// Вывод данных ----------------------------------------
 void employeeData(const Employee& employee)
 {
-	printf("%s %s %s\n", employee.lastName, employee.name, employee.patronymic);
+	printf("ФИО: %s %s %s\n",
+		employee.lastName,
+		employee.name,
+		employee.patronymic);
 	printf("Табельный номер: %d\n", employee.employeeID);
 	printf("Количество проработанных часов за месяц: %d\n",
 		employee.workedHoursPerMonth);
@@ -42,7 +47,7 @@ void employeesList(Employee* employees)
 	printf("Список сотрудников\n");
 	printf("******************\n");
 
-	for (int i = 0; i < MAX; i++)
+	for (int i = 0; i < countDefinedEmployees; i++)
 	{		
 		printf("%3d. %s %s %s, табельный номер: %d",
 			count, employees[i].lastName,
@@ -55,46 +60,42 @@ void employeesList(Employee* employees)
 	}
 }
 
-void showDetailEmployeeData(Employee* employees)
+void showEmployeeList(Employee* employees)
 {
 	int num{};
 
 	while (true)
 	{
-		printf("\nПоказать подробную информацию о сотруднике\n");
-		printf("Введите номер сотрудника из списка(0 для выхода): ");
+		system("cls");
+		employeesList(employees);
+
+		printf("\nДля просмотра информации о сотруднике: \n");
+		printf("Введите номер сотрудника из списка: \n");
+		printf("0 для выхода\n");
 		cin >> num;
 
-		if (!cin || num < 0 || num > MAX)
+		if (!cin)
 		{			
 			cin.clear();
-			cin.ignore(100, '\n');
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
 			cout << "Неверный ввод" << endl;
 			system("pause");
-			system("cls");
-			employeesList(employees);
 			continue;
 		}
 
-		if (num == 0) return;
+		if (num < 0 || num > countDefinedEmployees)
+		{
+			cout << "Неверный ввод" << endl;
+			system("pause");
+			continue;
+		}
+
+		if (!num) return;
 
 		system("cls");
 		employeeData(employees[num - 1]);
 		system("pause");
-
-		system("cls");
-		employeesList(employees);
 	}
-}
-
-void showEmployeeList(Employee* employees)
-{
-	while (true)
-	{
-		employeesList(employees);
-		showDetailEmployeeData(employees);
-		return;
-	}	
 }
 
 void showAllData(Employee* employees)
@@ -103,19 +104,27 @@ void showAllData(Employee* employees)
 
 	system("cls");
 	printf("Все данные\n");
-	printf("****************\n");
+	printf("**********\n");
 
-	for (int i = 0; i < MAX; i++)
+	for (int i = 0; i < countDefinedEmployees; i++)
 	{
 		printf("%d. ",count);
 		employeeData(employees[i]);
 		cout << endl;
 		count++;
 	}
+	system("pause");
 }
 
 void showData(Employee* employees)
 {
+	if (!countDefinedEmployees)
+	{
+		printf("Данные не вводились\n");
+		system("pause");
+		return;
+	}
+
 	while (true)
 	{
 		system("cls");
@@ -129,12 +138,11 @@ void showData(Employee* employees)
 		cin >> menu;
 		switch (menu[0])
 		{
-		case '1':			
+		case '1': 
 			showEmployeeList(employees);
 			break;
 		case '2':			
 			showAllData(employees);
-			system("pause");
 			break;
 		case '0': return;
 		default:
@@ -143,6 +151,96 @@ void showData(Employee* employees)
 		}
 	}
 }
+//----------------------------------------------
+
+// Добавление данных ---------------------------
+void addData(Employee* employees)
+{
+	int i = countDefinedEmployees;
+	system("cls");
+	printf("Добавить нового сотрудника\n");
+	printf("**************************\n");	
+
+	bool continueAdd{true};
+	while (continueAdd)
+	{
+		printf("1. Ввести данные\n");
+		printf("0. В главное меню\n");
+		char menu[80];
+		cin >> menu;
+		switch (menu[0])
+		{
+		case '1': continueAdd = false; break;
+		case '0': return;
+		default:
+			printf("Неправильный пункт меню\n");
+			system("pause");
+			system("cls");
+			printf("Добавить нового сотрудника\n");
+			printf("**************************\n");
+		}
+	}
+
+	int lineLength { 29 };
+	printf("Допустимое количество вводимых символов: %d\n\n", lineLength);
+
+	try
+	{
+		cin.ignore();
+		printf("Введите фамилию: ");
+		cin.getline(employees[i].lastName, 30);
+		if (!cin && cin.gcount() == lineLength) throw 1;
+
+		printf("\nВведите имя: ");
+		cin.getline(employees[i].name, 30);
+		if (!cin && cin.gcount() == lineLength) throw 1;
+
+		printf("\nВведите отчество: ");
+		cin.getline(employees[i].patronymic, 30);
+		if (!cin && cin.gcount() == lineLength) throw 1;
+
+		printf("\nВведите количество проработанных часов за месяц: ");
+		cin >> employees[i].workedHoursPerMonth;
+		if (!cin) throw 2;
+
+		printf("Введите почасовой тариф: ");
+		cin >> employees[i].hourlyRate;
+		if (!cin) throw 2;
+	}
+	catch (int i)
+	{
+		switch (i)
+		{
+		case 1:
+			printf("Превышено допустимое количество вводимых символов: %d\n", lineLength);
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			system("pause");
+			return;
+		case 2:
+			printf("Введено не число\n");
+			cin.clear();
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			system("pause");
+			return;
+		}		
+	}
+
+	if (!employees[0].isDefined)
+	{
+		employees[i].employeeID = 1;
+	}
+	else
+	{
+		employees[i].employeeID =
+			employees[i - 1].employeeID++;
+	}
+	employees[i].isDefined = true;
+	countDefinedEmployees++;
+	printf("Данные введены\n");
+	system("pause");
+}
+
 
 int main()
 {
@@ -150,18 +248,12 @@ int main()
 	SetConsoleOutputCP(1251);
 
 	Employee* employees = new Employee[20];
-	/*showDetailEmployeeData(employees);
-	system("pause");*/
-	/*employeeData(employees[1]);
-	system("pause");*/
-	/*employeesList(employees);
-	system("pause");*/
 
 	while (true)
 	{
 		system("cls");
 		printf("Главное меню\n");
-		printf("****************\n");
+		printf("************\n");
 		printf("1. Вывести данные на экран\n");
 		printf("2. Добавить данные\n");
 		printf("3. Удалить данные\n");
@@ -175,7 +267,7 @@ int main()
 		switch (menu[0])
 		{
 		case '1': showData(employees); break;
-		case '2': break;
+		case '2': addData(employees); break;
 		case '3': break;
 		case '4': break;
 		case '5': break;
