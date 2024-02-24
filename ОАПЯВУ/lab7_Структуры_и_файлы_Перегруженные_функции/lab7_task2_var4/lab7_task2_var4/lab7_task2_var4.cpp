@@ -7,6 +7,7 @@
 #include <cmath>
 #include <Windows.h>
 #include <limits>
+#include <string>
 #define _USE_MATH_DEFINES 
 #undef max
 using namespace std;
@@ -25,6 +26,26 @@ struct Employee
 	bool isDefined{};
 };
 
+// Очистка cin.fail
+void cinClear()
+{
+	cin.clear();
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
+
+// Проверка корректности ввода пункта списка
+bool cinOption(int& option)
+{
+	cin >> option;
+	if (!cin)
+	{
+		printf("Неверный ввод\n");
+		cinClear();
+		system("pause");
+		return false;
+	}
+	return true;
+}
 
 // Вывод данных ----------------------------------------
 void employeeData(const Employee& employee)
@@ -62,7 +83,7 @@ void employeesList(Employee* employees)
 
 void showEmployeeList(Employee* employees)
 {
-	int num{};
+	int option{};
 
 	while (true)
 	{
@@ -72,28 +93,21 @@ void showEmployeeList(Employee* employees)
 		printf("\nДля просмотра информации о сотруднике: \n");
 		printf("Введите номер сотрудника из списка: \n");
 		printf("0 для выхода\n");
-		cin >> num;
 
-		if (!cin)
-		{			
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
-			cout << "Неверный ввод" << endl;
-			system("pause");
-			continue;
-		}
+		int option{};
+		if (!cinOption(option)) continue;
 
-		if (num < 0 || num > countDefinedEmployees)
+		if (option < 0 || option > countDefinedEmployees)
 		{
 			cout << "Неверный ввод" << endl;
 			system("pause");
 			continue;
 		}
 
-		if (!num) return;
+		if (!option) return;
 
 		system("cls");
-		employeeData(employees[num - 1]);
+		employeeData(employees[option - 1]);
 		system("pause");
 	}
 }
@@ -134,19 +148,20 @@ void showData(Employee* employees)
 		printf("2. Вывести все данные\n");
 		printf("0. В главное меню\n");
 		
-		char menu[80];
-		cin >> menu;
-		switch (menu[0])
+		int option{};
+		if (!cinOption(option)) continue;
+
+		switch (option)
 		{
-		case '1': 
+		case 1: 
 			showEmployeeList(employees);
 			break;
-		case '2':			
+		case 2:			
 			showAllData(employees);
 			break;
-		case '0': return;
+		case 0: return;
 		default:
-			printf("Неправильный пункт меню\n");
+			printf("Неверный ввод\n");
 			system("pause");
 		}
 	}
@@ -154,33 +169,38 @@ void showData(Employee* employees)
 //----------------------------------------------
 
 // Добавление данных ---------------------------
+
+bool addDataMenu()
+{
+	while (true)
+	{
+		system("cls");
+		printf("Добавить нового сотрудника\n");
+		printf("**************************\n");
+
+		printf("1. Ввести данные\n");
+		printf("0. В главное меню\n");
+
+		int option{};
+		if (!cinOption(option)) continue;
+
+		switch (option)
+		{
+		case 1: return true;
+		case 0: return false;
+		default:
+			printf("Неверный ввод\n");
+			system("pause");
+		}
+	}
+}
+
 void addData(Employee* employees)
 {
 	int i = countDefinedEmployees;
-	system("cls");
-	printf("Добавить нового сотрудника\n");
-	printf("**************************\n");	
-
-	bool continueAdd{true};
-	while (continueAdd)
-	{
-		printf("1. Ввести данные\n");
-		printf("0. В главное меню\n");
-		char menu[80];
-		cin >> menu;
-		switch (menu[0])
-		{
-		case '1': continueAdd = false; break;
-		case '0': return;
-		default:
-			printf("Неправильный пункт меню\n");
-			system("pause");
-			system("cls");
-			printf("Добавить нового сотрудника\n");
-			printf("**************************\n");
-		}
-	}
-
+	
+	if (!addDataMenu()) return;
+	
 	int lineLength { 29 };
 	printf("Допустимое количество вводимых символов: %d\n\n", lineLength);
 
@@ -213,33 +233,82 @@ void addData(Employee* employees)
 		{
 		case 1:
 			printf("Превышено допустимое количество вводимых символов: %d\n", lineLength);
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cinClear();
 			system("pause");
 			return;
 		case 2:
 			printf("Введено не число\n");
-			cin.clear();
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			cinClear();
 			system("pause");
 			return;
 		}		
 	}
 
-	if (!employees[0].isDefined)
+	if (employees[0].isDefined)
 	{
-		employees[i].employeeID = 1;
+		employees[i].employeeID = employees[i - 1].employeeID++;		
 	}
 	else
 	{
-		employees[i].employeeID =
-			employees[i - 1].employeeID++;
+		employees[i].employeeID = 1;
 	}
+
 	employees[i].isDefined = true;
 	countDefinedEmployees++;
 	printf("Данные введены\n");
 	system("pause");
 }
+
+Employee e;
+void fillEmloyeesArray(Employee* employees)
+{
+	srand(time(0));
+	int minHour{ 130 };
+	int maxHour{ 160 };
+	int minRate{ 10 };
+	int maxRate{ 20 };
+
+	
+
+	string names[5][30] =
+	{
+		{"Борисова", "Александра", "Артёмовна"},
+		{"Королева", "Анна", "Михайловна"},
+		{"Яковлев", "Лев", "Михайлович"},
+		{"Киселев", "Михаил", "Лукич" },
+		{"Калашникова", "Алёна", "Богдановна"}
+	};
+
+	for (int i = 0; i < 5; i++)
+	{
+		strcpy_s(employees[i].lastName, names[i][0].c_str());
+		strcpy_s(employees[i].name, names[i][1].c_str());
+		strcpy_s(employees[i].patronymic, names[i][2].c_str());		
+		employees[i].employeeID = i + 1;
+		employees[i].workedHoursPerMonth =
+			minHour + rand() % (maxHour - minHour + 1);
+		employees[i].hourlyRate =
+			minRate + rand() % (maxRate - minRate + 1);
+		employees[i].isDefined = true;
+
+		countDefinedEmployees++;
+	}
+
+	/*string s = "safsf";
+	strcpy_s(e.name, names[0][1].c_str());
+	cout << e.name;*/
+
+	/*employees[i].lastName[30] = "";
+	employees[i].name[30] = "";
+	employees[i].patronymic[30] = "";
+	employees[i].employeeID = ;
+	employees[i].workedHoursPerMonth = ;
+	employees[i].hourlyRate = ;
+	employees[i].isDefined = ;*/
+}
+// ---------------------------------------
+
+// Удалить данные ------------------------
 
 
 int main()
@@ -247,7 +316,14 @@ int main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
+	
+
+	/*char str[30] = "sfdaf";
+	cout << strlen(str) << endl;
+	system("pause");*/
+
 	Employee* employees = new Employee[20];
+	fillEmloyeesArray(employees);
 
 	while (true)
 	{
@@ -258,26 +334,28 @@ int main()
 		printf("2. Добавить данные\n");
 		printf("3. Удалить данные\n");
 		printf("4. Редактировать данные\n");
-		printf("5. Записать массив в файл (бинарный\n");
+		printf("5. Записать массив в файл (бинарный)\n");
 		printf("6. Считать массив из файла\n");
 		printf("7. Выполнение задачи\n");
 		printf("0. Выход\n");
-		char menu[80];
-		cin >> menu;
-		switch (menu[0])
+
+		int option{};
+		if (!cinOption(option)) continue;
+
+		switch (option)
 		{
-		case '1': showData(employees); break;
-		case '2': addData(employees); break;
-		case '3': break;
-		case '4': break;
-		case '5': break;
-		case '6': break;
-		case '7': break;
-		case '0':
+		case 1: showData(employees); break;
+		case 2: addData(employees); break;
+		case 3: break;
+		case 4: break;
+		case 5: break;
+		case 6: break;
+		case 7: break;
+		case 0:
 			system("pause");
 			return 0;
 		default:
-			printf("Неправильный пункт меню\n");
+			printf("Неверный ввод\n");			
 			system("pause");
 		}
 	}
