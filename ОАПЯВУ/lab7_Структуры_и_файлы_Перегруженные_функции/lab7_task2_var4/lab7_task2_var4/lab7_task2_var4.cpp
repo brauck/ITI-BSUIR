@@ -23,7 +23,6 @@ struct Employee
 	int employeeID{};
 	int workedHoursPerMonth{};
 	int hourlyRate{};
-	bool isDefined{};
 };
 
 // Очистка cin.fail
@@ -64,7 +63,6 @@ void employeesList(Employee* employees)
 {
 	int count{ 1 };
 
-	system("cls");
 	printf("Список сотрудников\n");
 	printf("******************\n");
 
@@ -84,22 +82,20 @@ void employeesList(Employee* employees)
 void showEmployeeList(Employee* employees)
 {
 	int option{};
-
 	while (true)
 	{
 		system("cls");
-		employeesList(employees);
-
 		printf("\nДля просмотра информации о сотруднике: \n");
 		printf("Введите номер сотрудника из списка: \n");
-		printf("0 для выхода\n");
+		printf("0 для выхода\n\n");
+		
+		employeesList(employees);
 
-		int option{};
 		if (!cinOption(option)) continue;
 
 		if (option < 0 || option > countDefinedEmployees)
 		{
-			cout << "Неверный ввод" << endl;
+			printf("Неверный ввод\n");
 			system("pause");
 			continue;
 		}
@@ -108,7 +104,7 @@ void showEmployeeList(Employee* employees)
 
 		system("cls");
 		employeeData(employees[option - 1]);
-		system("pause");
+		system("pause");		
 	}
 }
 
@@ -139,6 +135,7 @@ void showData(Employee* employees)
 		return;
 	}
 
+	int option{};
 	while (true)
 	{
 		system("cls");
@@ -148,7 +145,6 @@ void showData(Employee* employees)
 		printf("2. Вывести все данные\n");
 		printf("0. В главное меню\n");
 		
-		int option{};
 		if (!cinOption(option)) continue;
 
 		switch (option)
@@ -172,6 +168,7 @@ void showData(Employee* employees)
 
 bool addDataMenu()
 {
+	int option{};
 	while (true)
 	{
 		system("cls");
@@ -181,7 +178,6 @@ bool addDataMenu()
 		printf("1. Ввести данные\n");
 		printf("0. В главное меню\n");
 
-		int option{};
 		if (!cinOption(option)) continue;
 
 		switch (option)
@@ -197,6 +193,14 @@ bool addDataMenu()
 
 void addData(Employee* employees)
 {
+	if (countDefinedEmployees == 20)
+	{
+		printf("Штат заполнен\n");
+		printf("Невозможно добавить нового сотрудника\n");
+		system("pause");
+		return;
+	}
+
 	int i = countDefinedEmployees;
 	
 	if (!addDataMenu()) return;
@@ -244,7 +248,7 @@ void addData(Employee* employees)
 		}		
 	}
 
-	if (employees[0].isDefined)
+	if (employees[0].employeeID)
 	{
 		employees[i].employeeID = employees[i - 1].employeeID++;		
 	}
@@ -253,33 +257,44 @@ void addData(Employee* employees)
 		employees[i].employeeID = 1;
 	}
 
-	employees[i].isDefined = true;
 	countDefinedEmployees++;
 	printf("Данные введены\n");
 	system("pause");
 }
 
-Employee e;
-void fillEmloyeesArray(Employee* employees)
+void fillEmloyeesArray(Employee* employees, int size)
 {
 	srand(time(0));
 	int minHour{ 130 };
 	int maxHour{ 160 };
 	int minRate{ 10 };
-	int maxRate{ 20 };
+	int maxRate{ 20 };	
 
-	
-
-	string names[5][30] =
+	string names[20][3] =
 	{
 		{"Борисова", "Александра", "Артёмовна"},
 		{"Королева", "Анна", "Михайловна"},
 		{"Яковлев", "Лев", "Михайлович"},
 		{"Киселев", "Михаил", "Лукич" },
-		{"Калашникова", "Алёна", "Богдановна"}
+		{"Калашникова", "Алёна", "Богдановна"},
+		{"Платонова", "Анна", "Филипповна"},
+		{"Кузнецова", "Анна", "Фёдоровна"},
+		{"Зеленина", "Мария", "Фёдоровна"},
+		{"Соболева", "Екатерина", "Арсентьевна"},
+		{"Беляева", "Анна", "Алексеевна"},
+		{"Ермаков", "Артём", "Борисович"},
+		{"Корнилов", "Владимир", "Иванович"},
+		{"Бобров", "Матвей", "Мирославович"},
+		{"Усова", "Олеся", "Андреевна"},
+		{"Раков", "Артём", "Даниилович"},
+		{"Васильев", "Даниил", "Вячеславович"},
+		{"Крылов", "Егор", "Георгиевич"},
+		{"Журавлев", "Андрей", "Денисович"},
+		{"Федотова", "Оливия", "Дмитриевна"},
+		{"Дубровин", "Александр", "Ярославович"}
 	};
 
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < size; i++)
 	{
 		strcpy_s(employees[i].lastName, names[i][0].c_str());
 		strcpy_s(employees[i].name, names[i][1].c_str());
@@ -289,45 +304,87 @@ void fillEmloyeesArray(Employee* employees)
 			minHour + rand() % (maxHour - minHour + 1);
 		employees[i].hourlyRate =
 			minRate + rand() % (maxRate - minRate + 1);
-		employees[i].isDefined = true;
 
 		countDefinedEmployees++;
 	}
-
-	/*string s = "safsf";
-	strcpy_s(e.name, names[0][1].c_str());
-	cout << e.name;*/
-
-	/*employees[i].lastName[30] = "";
-	employees[i].name[30] = "";
-	employees[i].patronymic[30] = "";
-	employees[i].employeeID = ;
-	employees[i].workedHoursPerMonth = ;
-	employees[i].hourlyRate = ;
-	employees[i].isDefined = ;*/
 }
 // ---------------------------------------
 
-// Удалить данные ------------------------
+// Удаленее данных -----------------------
+Employee* deleteData(Employee* employees, int index)
+{
+	Employee* tempEmployees = new Employee[20];
 
+	for (int i = 0; i < index; i++)
+	{
+		tempEmployees[i] = employees[i];
+	}
+
+	for (int i = 0; i < countDefinedEmployees - index - 1; index++)
+	{
+		tempEmployees[index] = employees[index + 1];
+	}
+
+	countDefinedEmployees--;
+	
+	return tempEmployees;
+}
+
+Employee* deleteData(Employee* employees)
+{
+	int option{};
+	int index{};
+	while (true)
+	{		
+		system("cls");
+		printf("\nДля удаления сотрудника: \n");
+		printf("Введите номер сотрудника из списка: \n");
+		printf("0 для выхода\n\n");
+
+		employeesList(employees);
+		
+		if (!cinOption(option)) continue;
+
+		if (option < 0 || option > countDefinedEmployees)
+		{
+			printf("Неверный ввод\n");
+			system("pause");
+			continue;
+		}
+
+		index = option - 1;
+		if (!option) return employees;
+
+		printf("Вы собираетесь удалить сотрудника:\n%s %s %s\n",
+			employees[index].lastName,
+			employees[index].name,
+			employees[index].patronymic);
+		printf("Для подтверждения нажмите 1\n");
+
+		if (!cinOption(option)) continue;
+
+		if (option == 1)
+		{
+			employees = deleteData(employees, index);
+			printf("Сотрудник удален\n");
+			system("pause");
+		}
+	}	
+}
 
 int main()
 {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	
-
-	/*char str[30] = "sfdaf";
-	cout << strlen(str) << endl;
-	system("pause");*/
-
 	Employee* employees = new Employee[20];
-	fillEmloyeesArray(employees);
+	Employee* tempEmployees = new Employee[20];
+	fillEmloyeesArray(employees, 0);
 
 	while (true)
-	{
+	{		
 		system("cls");
+		cout << employees << endl;
 		printf("Главное меню\n");
 		printf("************\n");
 		printf("1. Вывести данные на экран\n");
@@ -346,7 +403,17 @@ int main()
 		{
 		case 1: showData(employees); break;
 		case 2: addData(employees); break;
-		case 3: break;
+		case 3:
+			if (!countDefinedEmployees)
+			{
+				printf("Данные не вводились\n");
+				system("pause");
+				break;
+			}
+			tempEmployees = deleteData(employees);
+			delete[] employees;
+			employees = tempEmployees;
+			break;
 		case 4: break;
 		case 5: break;
 		case 6: break;
