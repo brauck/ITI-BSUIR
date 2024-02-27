@@ -141,7 +141,7 @@ void showData(Employee* employees)
 	{
 		system("cls");
 		printf("Вывод данных\n");
-		printf("****************\n");
+		printf("************\n");
 		printf("1. Вывести список сотрудников\n");
 		printf("2. Вывести все данные\n");
 		printf("0. В главное меню\n");
@@ -338,6 +338,8 @@ Employee* deleteData(Employee* employees)
 	while (true)
 	{		
 		system("cls");
+		printf("Удаление сотрудника\n");
+		printf("*******************\n");
 		printf("\nДля удаления сотрудника: \n");
 		printf("Введите номер сотрудника из списка\n");
 		printf("0 для выхода\n\n");
@@ -375,10 +377,14 @@ Employee* deleteData(Employee* employees)
 // --------------------------------------------------
 
 // Редактирование данных ----------------------------
-void editData(Employee* employees, int index)
+void editData(Employee& employee)
 {
 	while (true)
-	{		
+	{	
+		system("cls");
+		employeeData(employee);
+		cout << endl;
+
 		printf("1. Изменить фамилию\n");
 		printf("2. Изменить имя\n");
 		printf("3. Изменить отчество\n");
@@ -396,43 +402,41 @@ void editData(Employee* employees, int index)
 ;			switch (option)
 			{
 			case 1:
-				printf("\nВведите новую фамилию: ");
-				cin.getline(employees[index].lastName, 30);
+				printf("Введите новую фамилию: ");
+				cin.getline(employee.lastName, 30);
 				if (!cin && cin.gcount() == lineLength) throw 1;
 				printf("Фамилия изменена\n");
 				system("pause");
 				break;
 			case 2:
-				printf("\nВведите новое имя: ");
-				cin.getline(employees[index].lastName, 30);
+				printf("Введите новое имя: ");
+				cin.getline(employee.name, 30);
 				if (!cin && cin.gcount() == lineLength) throw 1;
 				printf("Имя изменено\n");
 				system("pause");
 				break;
 			case 3:
-				printf("\nВведите новое отчество: ");
-				cin.getline(employees[index].lastName, 30);
+				printf("Введите новое отчество: ");
+				cin.getline(employee.patronymic, 30);
 				if (!cin && cin.gcount() == lineLength) throw 1;
 				printf("Отчество изменено\n");
 				system("pause");
 				break;
 			case 4:
-				printf("\nВведите количество проработанных часов: ");
-				cin >> employees[index].workedHoursPerMonth;
+				printf("Введите количество проработанных часов: ");
+				cin >> employee.workedHoursPerMonth;
 				if (!cin) throw 2;
 				printf("Количество проработанных часов изменено\n");
 				system("pause");
 				break;
 			case 5:
-				printf("\nВведите новый почасовой тариф: ");
-				cin >> employees[index].workedHoursPerMonth;
+				printf("Введите новый почасовой тариф: ");
+				cin >> employee.hourlyRate;
 				if (!cin) throw 2;
 				printf("Почасовой тариф изменен\n");
 				system("pause");
 				break;
-			case 0:
-				system("pause");
-				return;
+			case 0:	return;
 			default:
 				printf("Неверный ввод\n");
 				system("pause");
@@ -458,13 +462,15 @@ void editData(Employee* employees, int index)
 
 }
 
-Employee* editData(Employee* employees)
+void editData(Employee* employees)
 {
 	int option{};
 	int index{};
 	while (true)
 	{
 		system("cls");
+		printf("Редактирование данных сотрудника\n");
+		printf("********************************\n");
 		printf("\nДля редактирования данных сотрудника: \n");
 		printf("Введите номер сотрудника из списка: \n");
 		printf("0 для выхода\n\n");
@@ -480,14 +486,13 @@ Employee* editData(Employee* employees)
 			continue;
 		}
 
-		index = option - 1;
+		if (!option) return;
 
-		system("cls");
-		employeeData(employees[index]);
-		editData(employees, index);
+		index = option - 1;
+		editData(employees[index]);
 	}
 }
-
+// -------------------------------------
 
 int main()
 {
@@ -525,6 +530,7 @@ int main()
 		case 3:
 			if (noData()) break;
 			tempEmployees = deleteData(employees);
+			if (tempEmployees == employees) break;
 			delete[] employees;
 			employees = tempEmployees;
 			break;
