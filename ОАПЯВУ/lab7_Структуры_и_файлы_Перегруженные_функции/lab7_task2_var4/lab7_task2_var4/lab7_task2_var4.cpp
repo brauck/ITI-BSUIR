@@ -3,12 +3,9 @@
 // variant #4
 #define _USE_MATH_DEFINES
 #include <iostream>
-#include <cstring>
-#include <cmath>
 #include <Windows.h>
 #include <limits>
 #include <string>
-#define _USE_MATH_DEFINES 
 #undef max
 using namespace std;
 
@@ -44,6 +41,17 @@ bool cinOption(int& option)
 		return false;
 	}
 	return true;
+}
+
+bool noData()
+{
+	if (!countDefinedEmployees)
+	{
+		printf("Данные не вводились\n");
+		system("pause");
+		return true;
+	}
+	return false;
 }
 
 // Вывод данных ----------------------------------------
@@ -128,13 +136,6 @@ void showAllData(Employee* employees)
 
 void showData(Employee* employees)
 {
-	if (!countDefinedEmployees)
-	{
-		printf("Данные не вводились\n");
-		system("pause");
-		return;
-	}
-
 	int option{};
 	while (true)
 	{
@@ -193,7 +194,7 @@ bool addDataMenu()
 
 void addData(Employee* employees)
 {
-	if (countDefinedEmployees == 20)
+	if (countDefinedEmployees == MAX)
 	{
 		printf("Штат заполнен\n");
 		printf("Невозможно добавить нового сотрудника\n");
@@ -313,7 +314,7 @@ void fillEmloyeesArray(Employee* employees, int size)
 // Удаленее данных -----------------------
 Employee* deleteData(Employee* employees, int index)
 {
-	Employee* tempEmployees = new Employee[20];
+	Employee* tempEmployees = new Employee[MAX];
 
 	for (int i = 0; i < index; i++)
 	{
@@ -338,7 +339,7 @@ Employee* deleteData(Employee* employees)
 	{		
 		system("cls");
 		printf("\nДля удаления сотрудника: \n");
-		printf("Введите номер сотрудника из списка: \n");
+		printf("Введите номер сотрудника из списка\n");
 		printf("0 для выхода\n\n");
 
 		employeesList(employees);
@@ -371,15 +372,131 @@ Employee* deleteData(Employee* employees)
 		}
 	}	
 }
+// --------------------------------------------------
+
+// Редактирование данных ----------------------------
+void editData(Employee* employees, int index)
+{
+	while (true)
+	{		
+		printf("1. Изменить фамилию\n");
+		printf("2. Изменить имя\n");
+		printf("3. Изменить отчество\n");
+		printf("4. Изменить количество проработанных часов за месяц\n");
+		printf("5. Изменить почасовой тариф\n");
+		printf("0. Выход\n");
+
+		int lineLength{ 29 };
+		int option{};
+		if (!cinOption(option)) continue;
+
+		try
+		{
+			cin.ignore();
+;			switch (option)
+			{
+			case 1:
+				printf("\nВведите новую фамилию: ");
+				cin.getline(employees[index].lastName, 30);
+				if (!cin && cin.gcount() == lineLength) throw 1;
+				printf("Фамилия изменена\n");
+				system("pause");
+				break;
+			case 2:
+				printf("\nВведите новое имя: ");
+				cin.getline(employees[index].lastName, 30);
+				if (!cin && cin.gcount() == lineLength) throw 1;
+				printf("Имя изменено\n");
+				system("pause");
+				break;
+			case 3:
+				printf("\nВведите новое отчество: ");
+				cin.getline(employees[index].lastName, 30);
+				if (!cin && cin.gcount() == lineLength) throw 1;
+				printf("Отчество изменено\n");
+				system("pause");
+				break;
+			case 4:
+				printf("\nВведите количество проработанных часов: ");
+				cin >> employees[index].workedHoursPerMonth;
+				if (!cin) throw 2;
+				printf("Количество проработанных часов изменено\n");
+				system("pause");
+				break;
+			case 5:
+				printf("\nВведите новый почасовой тариф: ");
+				cin >> employees[index].workedHoursPerMonth;
+				if (!cin) throw 2;
+				printf("Почасовой тариф изменен\n");
+				system("pause");
+				break;
+			case 0:
+				system("pause");
+				return;
+			default:
+				printf("Неверный ввод\n");
+				system("pause");
+			}
+		}
+		catch (int i)
+		{
+			switch (i)
+			{
+			case 1:
+				printf("Превышено допустимое количество вводимых символов: %d\n", lineLength);
+				cinClear();
+				system("pause");
+				return;
+			case 2:
+				printf("Введено не число\n");
+				cinClear();
+				system("pause");
+				return;
+			}
+		}
+	}
+
+}
+
+Employee* editData(Employee* employees)
+{
+	int option{};
+	int index{};
+	while (true)
+	{
+		system("cls");
+		printf("\nДля редактирования данных сотрудника: \n");
+		printf("Введите номер сотрудника из списка: \n");
+		printf("0 для выхода\n\n");
+
+		employeesList(employees);
+
+		if (!cinOption(option)) continue;
+
+		if (option < 0 || option > countDefinedEmployees)
+		{
+			printf("Неверный ввод\n");
+			system("pause");
+			continue;
+		}
+
+		index = option - 1;
+
+		system("cls");
+		employeeData(employees[index]);
+		editData(employees, index);
+	}
+}
+
 
 int main()
 {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	Employee* employees = new Employee[20];
-	Employee* tempEmployees = new Employee[20];
-	fillEmloyeesArray(employees, 0);
+	Employee* employees = new Employee[MAX];
+	Employee* tempEmployees = new Employee[MAX];
+	fillEmloyeesArray(employees, 10);
 
 	while (true)
 	{		
@@ -401,20 +518,20 @@ int main()
 
 		switch (option)
 		{
-		case 1: showData(employees); break;
-		case 2: addData(employees); break;
+		case 1:
+			if (noData()) break;
+			showData(employees); break;
+		case 2:	addData(employees); break;
 		case 3:
-			if (!countDefinedEmployees)
-			{
-				printf("Данные не вводились\n");
-				system("pause");
-				break;
-			}
+			if (noData()) break;
 			tempEmployees = deleteData(employees);
 			delete[] employees;
 			employees = tempEmployees;
 			break;
-		case 4: break;
+		case 4:
+			if (noData()) break;
+			editData(employees);
+			break;
 		case 5: break;
 		case 6: break;
 		case 7: break;
