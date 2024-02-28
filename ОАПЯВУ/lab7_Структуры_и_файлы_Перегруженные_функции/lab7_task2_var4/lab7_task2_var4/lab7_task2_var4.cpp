@@ -10,19 +10,23 @@
 using namespace std;
 
 const int MAX{ 20 };
+const int overWork{ 144 };
+const int maxFilenameLength{ 100 };
 int countDefinedEmployees{};
 
 struct Employee
 {
-	char lastName[30]{};
-	char name[30]{};
-	char patronymic[30]{};
+	const static int lineLength{ 30 };
+
+	char lastName[lineLength + 1]{};
+	char name[lineLength + 1]{};
+	char patronymic[lineLength + 1]{};
 	int employeeID{};
 	int workedHoursPerMonth{};
 	int hourlyRate{};
 };
 
-// Очистка cin.fail
+// Очистка failbit
 void cinClear()
 {
 	cin.clear();
@@ -77,7 +81,8 @@ void employeesList(Employee* employees)
 	for (int i = 0; i < countDefinedEmployees; i++)
 	{		
 		printf("%3d. %s %s %s, табельный номер: %d",
-			count, employees[i].lastName,
+			count,
+			employees[i].lastName,
 			employees[i].name,
 			employees[i].patronymic,
 			employees[i].employeeID);
@@ -206,29 +211,28 @@ void addData(Employee* employees)
 	
 	if (!addDataMenu()) return;
 	
-	int lineLength { 29 };
-	printf("Допустимое количество вводимых символов: %d\n\n", lineLength);
+	printf("Допустимое количество вводимых символов: %d\n\n", Employee::lineLength);
 
 	try
 	{
 		cin.ignore();
 		printf("Введите фамилию: ");
 		cin.getline(employees[i].lastName, 30);
-		if (!cin && cin.gcount() == lineLength) throw 1;
+		if (!cin && cin.gcount() == Employee::lineLength) throw 1;
 
 		printf("\nВведите имя: ");
 		cin.getline(employees[i].name, 30);
-		if (!cin && cin.gcount() == lineLength) throw 1;
+		if (!cin && cin.gcount() == Employee::lineLength) throw 1;
 
 		printf("\nВведите отчество: ");
 		cin.getline(employees[i].patronymic, 30);
-		if (!cin && cin.gcount() == lineLength) throw 1;
+		if (!cin && cin.gcount() == Employee::lineLength) throw 1;
 
 		printf("\nВведите количество проработанных часов за месяц: ");
 		cin >> employees[i].workedHoursPerMonth;
 		if (!cin) throw 2;
 
-		printf("Введите почасовой тариф: ");
+		printf("\nВведите почасовой тариф: ");
 		cin >> employees[i].hourlyRate;
 		if (!cin) throw 2;
 	}
@@ -237,7 +241,8 @@ void addData(Employee* employees)
 		switch (i)
 		{
 		case 1:
-			printf("Превышено допустимое количество вводимых символов: %d\n", lineLength);
+			printf("Превышено допустимое количество вводимых символов: %d\n",
+				Employee::lineLength);
 			cinClear();
 			system("pause");
 			return;
@@ -251,7 +256,7 @@ void addData(Employee* employees)
 
 	if (employees[0].employeeID)
 	{
-		employees[i].employeeID = employees[i - 1].employeeID++;		
+		employees[i].employeeID = employees[i - 1].employeeID + 1;		
 	}
 	else
 	{
@@ -259,7 +264,7 @@ void addData(Employee* employees)
 	}
 
 	countDefinedEmployees++;
-	printf("Данные введены\n");
+	printf("\nСотрудник добавлен\n");
 	system("pause");
 }
 
@@ -314,7 +319,17 @@ void fillEmloyeesArray(Employee* employees, int size)
 // Удаленее данных -----------------------
 Employee* deleteData(Employee* employees, int index)
 {
-	Employee* tempEmployees = new Employee[MAX];
+	Employee* tempEmployees{ nullptr };
+	try
+	{
+		tempEmployees = new Employee[MAX];
+	}
+	catch (const bad_alloc& e)
+	{
+		cout << "Выделение памяти не удалось: " << e.what() << '\n';
+		system("pause");
+		exit(1);
+	}
 
 	for (int i = 0; i < index; i++)
 	{
@@ -335,8 +350,16 @@ Employee* deleteData(Employee* employees)
 {
 	int option{};
 	int index{};
+
 	while (true)
-	{		
+	{
+		if (!countDefinedEmployees)
+		{
+			printf("\nДанных больше не существует\n");
+			system("pause");
+			return employees;
+		}
+			
 		system("cls");
 		printf("Удаление сотрудника\n");
 		printf("*******************\n");
@@ -379,6 +402,9 @@ Employee* deleteData(Employee* employees)
 // Редактирование данных ----------------------------
 void editData(Employee& employee)
 {
+	int lineLength{ 29 };
+	int option{};
+
 	while (true)
 	{	
 		system("cls");
@@ -391,9 +417,7 @@ void editData(Employee& employee)
 		printf("4. Изменить количество проработанных часов за месяц\n");
 		printf("5. Изменить почасовой тариф\n");
 		printf("0. Выход\n");
-
-		int lineLength{ 29 };
-		int option{};
+		
 		if (!cinOption(option)) continue;
 
 		try
@@ -402,21 +426,24 @@ void editData(Employee& employee)
 ;			switch (option)
 			{
 			case 1:
-				printf("Введите новую фамилию: ");
+				printf("Введите новую фамилию (не более %d символов): ",
+					Employee::lineLength);
 				cin.getline(employee.lastName, 30);
 				if (!cin && cin.gcount() == lineLength) throw 1;
 				printf("Фамилия изменена\n");
 				system("pause");
 				break;
 			case 2:
-				printf("Введите новое имя: ");
+				printf("Введите новое имя (не более %d символов): ",
+					Employee::lineLength);
 				cin.getline(employee.name, 30);
 				if (!cin && cin.gcount() == lineLength) throw 1;
 				printf("Имя изменено\n");
 				system("pause");
 				break;
 			case 3:
-				printf("Введите новое отчество: ");
+				printf("Введите новое отчество (не более %d символов): ",
+					Employee::lineLength);
 				cin.getline(employee.patronymic, 30);
 				if (!cin && cin.gcount() == lineLength) throw 1;
 				printf("Отчество изменено\n");
@@ -492,21 +519,160 @@ void editData(Employee* employees)
 		editData(employees[index]);
 	}
 }
-// -------------------------------------
+// ----------------------------------------
+
+// Запись массива в файл (бинарный) -------
+void save(Employee* employees)
+{
+	char filename[maxFilenameLength + 5]{}; // +(.bin + '\0')
+	printf("Максимальная длина имени файла: %d\n", maxFilenameLength);
+	printf("Введите имя файла для сохранения: ");
+	cin.ignore();
+	cin.getline(filename, maxFilenameLength + 1);
+
+	if (!cin) cinClear();
+
+	if (strlen(filename) > maxFilenameLength)
+	{
+		printf("Превышена максимальная длина имени файла\n");
+		printf("Файл не сохранен\n");
+		system("pause");
+		return;
+	}
+
+	strcat_s(filename, maxFilenameLength + 5, ".bin");
+
+	char* b{ nullptr };
+	FILE* file;
+
+	if (fopen_s(&file, filename, "wb"))
+	{
+		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
+		return;
+	}
+
+	for (int i = 0; i < MAX; i++)
+	{
+		b = (char*)&employees[i];
+
+		for (int i = 0; i < sizeof(Employee); i++)
+		{
+			if (fputc(*(b++), file) == EOF)
+			{
+				printf("Ошибка записи в файл\n");
+				if (fclose(file))
+				{
+					cout << "Ошибка закрытия файла: " << filename << endl;
+				}
+				system("pause");
+				return;
+			}
+		}
+	}
+		
+	printf("Данные сохранены в: %s\n", filename);
+
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
+	system("pause");
+}
+// ----------------------------------------------------------
+
+// Считывание массива из файла ------------------------------
+bool load(Employee* employees)
+{
+	char filename[maxFilenameLength + 5]{}; // +(.bin + '\0')
+	printf("Максимальная длина имени файла: %d\n", maxFilenameLength);
+	printf("Введите имя файла для загрузки: ");
+	cin.ignore();
+	cin.getline(filename, maxFilenameLength + 1);
+
+	if (!cin) cinClear();
+
+	if (strlen(filename) > maxFilenameLength)
+	{
+		printf("Превышена максимальная длина имени файла\n");
+		printf("Файл не считан\n");
+		system("pause");
+		return false;
+	}
+
+	strcat_s(filename, maxFilenameLength + 5, ".bin");
+
+	FILE* file;
+
+	if (fopen_s(&file, filename, "rb"))
+	{
+		cout << "Ошибка открытия файла: " << filename << endl;
+		system("pause");
+		return false;
+	}
+	if (
+		fread_s(
+			employees,
+			sizeof(Employee) * MAX,
+			sizeof(Employee),
+			MAX,
+			file) < MAX)
+	{
+		printf("Данные считаны неверно\n");
+		if (fclose(file))
+		{
+			cout << "Ошибка закрытия файла: " << filename << endl;
+		}
+		system("pause");
+		return false;
+	}
+
+	printf("Данные загружены\n");
+
+	if (fclose(file))
+	{
+		cout << "Ошибка закрытия файла: " << filename << endl;
+	}
+
+	system("pause");
+	return true;
+}
+// ----------------------------------------------------------
+
+// Выполнение задачи (варианте: 4) --------------------------
+
+/* Рабочее время свыше 144 часов
+считается сверхурочным и оплачивается в двойном размере.
+ВЫВЕСТИ РАЗМЕР ЗАРАБОТНОЙ ПЛАТЫ
+КАЖДОГО СОТРУДНИКА ФИРМЫ ЗА ВЫЧЕТОМ
+ПОДОХОДНОГО НАЛОГА, КОТОРЫЙ СОСТАВЛЯЕТ
+10 % ОТ СУММЫ ЗАРАБОТНОЙ ПЛАТЫ
+(сортировать по убыванию заработной платы). */
+
 
 int main()
 {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	Employee* employees = new Employee[MAX];
-	Employee* tempEmployees = new Employee[MAX];
-	fillEmloyeesArray(employees, 10);
+
+	Employee* employees{ nullptr };
+	Employee* tempEmployees{ nullptr };
+	try
+	{
+		employees = new Employee[MAX];
+		tempEmployees = new Employee[MAX];
+	}
+	catch (const bad_alloc& e)
+	{
+		cout << "Выделение памяти не удалось: " << e.what() << '\n';
+		system("pause");
+		return 1;
+	}
 
 	while (true)
 	{		
 		system("cls");
-		cout << employees << endl;
 		printf("Главное меню\n");
 		printf("************\n");
 		printf("1. Вывести данные на экран\n");
@@ -538,8 +704,23 @@ int main()
 			if (noData()) break;
 			editData(employees);
 			break;
-		case 5: break;
-		case 6: break;
+		case 5:
+			if (noData()) break;
+			save(employees);
+			break;
+		case 6:
+			if (load(employees))
+			{
+				for (int i = MAX - 1; i >= 0; i--)
+				{
+					if (employees[i].employeeID)
+					{
+						countDefinedEmployees = i + 1;
+						break;
+					}
+				}
+			}			
+			break;
 		case 7: break;
 		case 0:
 			system("pause");
