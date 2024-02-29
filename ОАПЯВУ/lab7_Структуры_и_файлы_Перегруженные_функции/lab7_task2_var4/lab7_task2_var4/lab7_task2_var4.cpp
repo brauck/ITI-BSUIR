@@ -6,11 +6,13 @@
 #include <Windows.h>
 #include <limits>
 #include <string>
+#include <cmath>
 #undef max
 using namespace std;
 
 const int MAX{ 20 };
 const int overWork{ 144 };
+const int incomeTax{ 10 };
 const int maxFilenameLength{ 100 };
 int countDefinedEmployees{};
 
@@ -24,7 +26,26 @@ struct Employee
 	int employeeID{};
 	int workedHoursPerMonth{};
 	int hourlyRate{};
+	double salary{};
 };
+
+// Расчет заработной платы
+double salary(int workedHours, int hourlyRate)
+{
+	double salary{};
+
+	if (workedHours > 144)
+	{
+		salary = overWork * hourlyRate +
+			(workedHours - overWork) * 2 * hourlyRate;
+	}
+	else
+	{
+		salary = workedHours * hourlyRate;
+	}
+
+	return (salary / 100) * (100 - incomeTax);
+}
 
 // Очистка failbit
 void cinClear()
@@ -69,6 +90,7 @@ void employeeData(const Employee& employee)
 	printf("Количество проработанных часов за месяц: %d\n",
 		employee.workedHoursPerMonth);
 	printf("Почасовой тариф: %d\n", employee.hourlyRate);
+	printf("Заработная плата: %.2f\n", employee.salary);
 }
 
 void employeesList(Employee* employees)
@@ -254,6 +276,9 @@ void addData(Employee* employees)
 		}		
 	}
 
+	employees[i].salary =
+		salary(employees[i].workedHoursPerMonth, employees[i].hourlyRate);
+
 	if (employees[0].employeeID)
 	{
 		employees[i].employeeID = employees[i - 1].employeeID + 1;		
@@ -310,6 +335,8 @@ void fillEmloyeesArray(Employee* employees, int size)
 			minHour + rand() % (maxHour - minHour + 1);
 		employees[i].hourlyRate =
 			minRate + rand() % (maxRate - minRate + 1);
+		employees[i].salary =
+			salary(employees[i].workedHoursPerMonth, employees[i].hourlyRate);
 
 		countDefinedEmployees++;
 	}
@@ -454,6 +481,8 @@ void editData(Employee& employee)
 				cin >> employee.workedHoursPerMonth;
 				if (!cin) throw 2;
 				printf("Количество проработанных часов изменено\n");
+				employee.salary =
+					salary(employee.workedHoursPerMonth, employee.hourlyRate);
 				system("pause");
 				break;
 			case 5:
@@ -461,6 +490,8 @@ void editData(Employee& employee)
 				cin >> employee.hourlyRate;
 				if (!cin) throw 2;
 				printf("Почасовой тариф изменен\n");
+				employee.salary =
+					salary(employee.workedHoursPerMonth, employee.hourlyRate);
 				system("pause");
 				break;
 			case 0:	return;
@@ -649,12 +680,77 @@ bool load(Employee* employees)
 10 % ОТ СУММЫ ЗАРАБОТНОЙ ПЛАТЫ
 (сортировать по убыванию заработной платы). */
 
+// Функция сортировки 
+void selectionSort(Employee* salaries)
+{
+	int maxSalaryIndex{};
+	Employee tempEmployee{};
+
+	for (int i = 0; i < countDefinedEmployees - 1; i++)
+	{
+		maxSalaryIndex = i;
+		for (int j = i + 1; j < countDefinedEmployees; j++)
+		{
+			if (salaries[j].salary > salaries[maxSalaryIndex].salary)
+			{
+				maxSalaryIndex = j;
+			}				
+		}
+
+		if (maxSalaryIndex != i)
+		{
+			tempEmployee = salaries[i];
+			salaries[i] = salaries[maxSalaryIndex];
+			salaries[maxSalaryIndex] = tempEmployee;
+		}
+	}
+}
+
+void sortSalaries(Employee* employees)
+{
+	Employee* salaries{ nullptr };
+	try
+	{
+		salaries = new Employee[countDefinedEmployees];
+	}
+	catch (const bad_alloc& e)
+	{
+		cout << "Выделение памяти не удалось: " << e.what() << '\n';
+		system("pause");
+		exit(1);
+	}
+
+	for (int i = 0; i < countDefinedEmployees; i++)
+	{
+		salaries[i] = employees[i];
+	}
+
+	selectionSort(salaries);
+
+	system("cls");
+	printf("Сортированный список заработныхплат (по убыванию)\n");
+	printf("*************************************************\n");
+
+	for (int i = 0; i < countDefinedEmployees; i++)
+	{
+		printf("%s %s %s\n",
+			salaries[i].lastName,
+			salaries[i].name,
+			salaries[i].patronymic);
+		printf("Заработная плата: %.2f\n\n", salaries[i].salary);
+	}
+
+	delete[] salaries;
+	system("pause");
+}
 
 int main()
 {
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
+	/*cout << 174960 / 100.0 << endl;
+	system("pause");*/
 
 	Employee* employees{ nullptr };
 	Employee* tempEmployees{ nullptr };
@@ -669,6 +765,12 @@ int main()
 		system("pause");
 		return 1;
 	}
+
+	fillEmloyeesArray(employees, 17);
+
+	/*int arr[] = { 64, 25, 12, 22, 11 };
+	cout << sizeof(arr) << endl;
+	system("pause");*/
 
 	while (true)
 	{		
@@ -721,7 +823,10 @@ int main()
 				}
 			}			
 			break;
-		case 7: break;
+		case 7:
+			if (noData()) break;
+			sortSalaries(employees);
+			break;
 		case 0:
 			system("pause");
 			return 0;
