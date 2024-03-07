@@ -9,18 +9,21 @@
 #undef max
 using namespace std;
 
-const int MAX{ 20 };                // Размер массива
-const int overWork{ 144 };			// Порог сверхурочного времени
-const int incomeTax{ 10 };			// Подоходный налог
-const int maxFilenameLength{ 100 }; // Допустимый размер имени файла
-int countDefinedEmployees{};		// Счетчик существующих сотрудников
+const int MAX{ 20 };              // Размер массива
+const int overWork{ 144 };		  // Порог сверхурочного времени
+const int incomeTax{ 10 };		  // Подоходный налог
+const char extension[] =  ".bin";
+const int cinFilenameLength{ 5 }; // Допустимый размер вводимого имени файла
+const int getlineFilenameBuffer{ cinFilenameLength + 1 }; // + '\0'
+const int fullFileNameBuffer{ cinFilenameLength + sizeof(extension) }; // + .bin
+int countDefinedEmployees{};	  // Счетчик существующих сотрудников
 
 struct Employee
 {
-	// Допустимый размер строки
-	const static int cinLineLength{ 30 }; // без '\0'
 	// Допустимый размер вводимой строки
-	const static int lineLength = Employee::cinLineLength + 1; // +'\0'
+	const static int cinLineLength{ 30 }; // без '\0'
+	// Допустимый размер строки
+	const static int lineLength = cinLineLength + 1; // +'\0'
 
 	char lastName[lineLength]{};
 	char name[lineLength]{};
@@ -192,7 +195,8 @@ void showData(Employee* employees)
 }
 //----------------------------------------------
 
-// Меню добавления данных ---------------------------
+// Добавление данных ---------------------------
+// Меню добавления данных
 bool addDataMenu()
 {
 	int option{};
@@ -426,9 +430,16 @@ Employee* deleteData(Employee* employees)
 			employees[index].lastName,
 			employees[index].name,
 			employees[index].patronymic);
-		printf("Для подтверждения введите 1\n");
+		printf("Для подтверждения введите: 1\n");
+		printf("Отмена: любой другой символ\n");
 
-		if (!cinOption(option)) continue;
+		cin >> option;
+		if (!cin)
+		{
+			cinClear();
+			continue;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 		if (option == 1)
 		{
@@ -586,35 +597,105 @@ void editData(Employee* employees)
 }
 // ----------------------------------------
 
+// Проверка корректности ввода имени файла
+// Допустимо вводить с расширением ('.' и следующие за ней символы игнорируются)
+bool filenameInput(char* filename)
+{
+	printf("Максимальная длина имени файла: %d\n", cinFilenameLength);
+	char ch{};
+	int i{};
+	for (; i < getlineFilenameBuffer; i++)
+	{
+		cin.get(ch);
+		if (ch == '\n')
+		{
+			filename[i] = '\0';
+			strcat_s(filename, fullFileNameBuffer, extension);
+			return true;
+		}
+		if (ch == '.')
+		{
+			filename[i] = '\0';
+			strcat_s(filename, fullFileNameBuffer, extension);
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			return true;
+		}
+		if (ch == '\\'
+			|| ch == '/'
+			|| ch == ':'
+			|| ch == '*'
+			|| ch == '?'
+			|| ch == '\"'
+			|| ch == '<'
+			|| ch == '>'
+			|| ch == '|')
+		{
+			printf("Имя файла не может содержать символы: \\ / : * ? \" < > |\n");
+			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			return false;
+		}
+		
+		filename[i] = ch;
+	}
+	printf("Превышена максимальная длина имени файла\n");
+	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	return false;
+}
+
 // Запись массива в файл (бинарный) -------
 void save(Employee* employees)
 {
-	char filename[maxFilenameLength + 5]{}; // +(.bin + '\0')
-	printf("Максимальная длина имени файла: %d\n", maxFilenameLength);
+	char filename[fullFileNameBuffer]{};
 	printf("Введите имя файла для сохранения: ");
-	cin.ignore();
-	cin.getline(filename, maxFilenameLength + 1);
-
-	if (!cin) cinClear();
-
-	if (strlen(filename) > maxFilenameLength)
+	if (!filenameInput(filename))
 	{
-		printf("Превышена максимальная длина имени файла\n");
-		printf("Файл не сохранен\n");
+		printf("Данные не сохранены\n");
 		system("pause");
 		return;
 	}
 
-	strcat_s(filename, maxFilenameLength + 5, ".bin");
-
 	char* b{ nullptr };
 	FILE* file;
 
-	if (fopen_s(&file, filename, "wb"))
+	if (fopen_s(&file, filename, "rb+"))
 	{
-		printf("Ошибка открытия файла: %s\n", filename);
-		system("pause");
-		return;
+		if (fopen_s(&file, filename, "wb"))
+		{
+			printf("Ошибка открытия файла: %s\n", filename);
+			system("pause");
+			return;
+		}
+	}
+	else
+	{
+		printf("Файл с таким именем уже существует: %s\n", filename);
+		printf("Перезаписать?:\n");
+		printf("Да: введите 1\n");
+		printf("Нет: любой другой символ\n");
+
+		int option{};
+		cin >> option;
+		if (!cin)
+		{
+			cinClear();
+			if (fclose(file))
+			{
+				printf("Ошибка закрытия файла: %s\n", filename);
+				system("pause");
+			}
+			return;
+		}
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+		if (option != 1)
+		{
+			if (fclose(file))
+			{
+				printf("Ошибка закрытия файла: %s\n", filename);
+				system("pause");				
+			}
+			return;
+		}			
 	}
 
 	for (int i = 0; i < MAX; i++)
@@ -648,24 +729,15 @@ void save(Employee* employees)
 
 // Считывание массива из файла ------------------------------
 bool load(Employee* employees)
-{
-	char filename[maxFilenameLength + 5]{}; // +(.bin + '\0')
-	printf("Максимальная длина имени файла: %d\n", maxFilenameLength);
+{	
+	char filename[fullFileNameBuffer]{};
 	printf("Введите имя файла для загрузки: ");
-	cin.ignore();
-	cin.getline(filename, maxFilenameLength + 1);
-
-	if (!cin) cinClear();
-
-	if (strlen(filename) > maxFilenameLength)
+	if (!filenameInput(filename))
 	{
-		printf("Превышена максимальная длина имени файла\n");
-		printf("Файл не считан\n");
+		printf("Данные не загружены\n");
 		system("pause");
 		return false;
 	}
-
-	strcat_s(filename, maxFilenameLength + 5, ".bin");
 
 	FILE* file;
 
@@ -704,8 +776,7 @@ bool load(Employee* employees)
 }
 // ----------------------------------------------------------
 
-// Выполнение задачи (варианте: 4) --------------------------
-
+// Выполнение задачи (вариант: 4) ---------------------------
 /* Рабочее время свыше 144 часов
 считается сверхурочным и оплачивается в двойном размере.
 ВЫВЕСТИ РАЗМЕР ЗАРАБОТНОЙ ПЛАТЫ
@@ -764,7 +835,7 @@ void sortSalaries(Employee* employees)
 
 	system("cls");
 	printf("Сортированный список заработных плат (по убыванию)\n");
-	printf("*************************************************\n");
+	printf("**************************************************\n");
 
 	for (int i = 0; i < countDefinedEmployees; i++)
 	{
@@ -784,10 +855,6 @@ int main()
 	SetConsoleCP(1251);
 	SetConsoleOutputCP(1251);
 
-	char str[] = ".bin";
-	cout << strlen(str) << endl;
-	system("pause");
-
 	Employee* employees{ nullptr };
 	Employee* tempEmployees{ nullptr };
 	try
@@ -802,10 +869,10 @@ int main()
 		return 1;
 	}
 
-	fillEmloyeesArray(employees, 17);
+	fillEmloyeesArray(employees, 4);
 
 	while (true)
-	{		
+	{
 		system("cls");
 		printf("Главное меню\n");
 		printf("************\n");
