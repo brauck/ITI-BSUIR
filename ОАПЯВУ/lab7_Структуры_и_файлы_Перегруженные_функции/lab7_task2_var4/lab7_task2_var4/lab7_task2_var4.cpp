@@ -1,21 +1,22 @@
 ﻿// Lab #7
 // task #2
 // variant #4
-#define _USE_MATH_DEFINES
 #include <iostream>
 #include <Windows.h>
 #include <limits>
 #include <string>
 #undef max
-using namespace std;
 
 const int MAX{ 20 };              // Размер массива
 const int overWork{ 144 };		  // Порог сверхурочного времени
 const int incomeTax{ 10 };		  // Подоходный налог
-const char extension[] =  ".bin";
-const int cinFilenameLength{ 5 }; // Допустимый размер вводимого имени файла
+const char extension[]{ ".bin" };
+// Допустимый размер вводимого имени файла
+const int cinFilenameLength{ 5 };
+// Имя файла + терминатор
 const int getlineFilenameBuffer{ cinFilenameLength + 1 }; // + '\0'
-const int fullFileNameBuffer{ cinFilenameLength + sizeof(extension) }; // + .bin
+// Имя файла + расширение + терминатор
+const int fullFileNameBuffer{ getlineFilenameBuffer + (sizeof(extension) - 1) }; // + .bin + '\0'
 int countDefinedEmployees{};	  // Счетчик существующих сотрудников
 
 struct Employee
@@ -55,22 +56,22 @@ double salary(int workedHours, int hourlyRate)
 // Очистка failbit
 void cinClear()
 {
-	cin.clear();
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	std::cin.clear();
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
 // Проверка корректности ввода пункта списка
 bool cinOption(int& option)
 {
-	cin >> option;
-	if (!cin)
+	std::cin >> option;
+	if (!std::cin)
 	{
 		printf("Неверный ввод\n");
 		cinClear();
 		system("pause");
 		return false;
 	}
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	return true;
 }
 
@@ -196,6 +197,40 @@ void showData(Employee* employees)
 //----------------------------------------------
 
 // Добавление данных ---------------------------
+// Предложение ввода фамилии, имени, отчества
+bool offerInput(const char* message, char* data, bool& isContinue)
+{
+	printf("%s :", message);
+	std::cin.getline(data, Employee::lineLength);
+	if (!std::cin && std::cin.gcount() == Employee::cinLineLength)
+	{
+		printf("Превышено допустимое количество вводимых символов: %d\n",
+			Employee::cinLineLength);
+		cinClear();
+		system("pause");
+		return false;
+	}
+	if (data[0] == '0') isContinue = false;
+	return true;
+}
+
+// Предложение ввода количества проработанных часов за месяц,
+// почасового тарифа
+bool offerInput(const char* message, int& data, bool& isContinue)
+{
+	printf("%s :", message);
+	std::cin >> data;
+	if (!std::cin)
+	{
+		printf("Введено не число\n");
+		cinClear();
+		system("pause");
+		return false;
+	}
+	if (!data) isContinue = false;
+	return true;
+}
+
 // Меню добавления данных
 bool addDataMenu()
 {
@@ -233,34 +268,45 @@ void addData(Employee* employees)
 		return;
 	}
 
+	bool isContinue{ true };
 	const int i = countDefinedEmployees;	
 	
 	if (!addDataMenu()) return;
 	
 	printf("Допустимое количество вводимых символов: %d\n\n", Employee::cinLineLength);
 
-	try
+	while(!offerInput("Введите фамилию", employees[i].lastName, isContinue));
+	if (!isContinue) return;
+	while (!offerInput("Введите имя", employees[i].name, isContinue));
+	if (!isContinue) return;
+	while (!offerInput("Введите отчество", employees[i].patronymic, isContinue));
+	if (!isContinue) return;
+	while (!offerInput("Введите количество проработанных часов за месяц",
+		employees[i].workedHoursPerMonth, isContinue));
+	if (!isContinue) return;
+	while (!offerInput("Введите почасовой тариф", employees[i].hourlyRate, isContinue));
+	if (!isContinue) return;
+	/*try
 	{
-		// cin.ignore();
 		printf("Введите фамилию: ");
-		cin.getline(employees[i].lastName, Employee::lineLength);
-		if (!cin && cin.gcount() == Employee::cinLineLength) throw 1;
+		std::cin.getline(employees[i].lastName, Employee::lineLength);
+		if (!std::cin && std::cin.gcount() == Employee::cinLineLength) throw 1;
 
 		printf("\nВведите имя: ");
-		cin.getline(employees[i].name, Employee::lineLength);
-		if (!cin && cin.gcount() == Employee::cinLineLength) throw 1;
+		std::cin.getline(employees[i].name, Employee::lineLength);
+		if (!std::cin && std::cin.gcount() == Employee::cinLineLength) throw 1;
 
 		printf("\nВведите отчество: ");
-		cin.getline(employees[i].patronymic, Employee::lineLength);
-		if (!cin && cin.gcount() == Employee::cinLineLength) throw 1;
+		std::cin.getline(employees[i].patronymic, Employee::lineLength);
+		if (!std::cin && std::cin.gcount() == Employee::cinLineLength) throw 1;
 
 		printf("\nВведите количество проработанных часов за месяц: ");
-		cin >> employees[i].workedHoursPerMonth;
-		if (!cin) throw 2;
+		std::cin >> employees[i].workedHoursPerMonth;
+		if (!std::cin) throw 2;
 
 		printf("\nВведите почасовой тариф: ");
-		cin >> employees[i].hourlyRate;
-		if (!cin) throw 2;
+		std::cin >> employees[i].hourlyRate;
+		if (!std::cin) throw 2;
 	}
 	catch (int i)
 	{
@@ -271,14 +317,14 @@ void addData(Employee* employees)
 				Employee::cinLineLength);
 			cinClear();
 			system("pause");
-			break;
+			return;
 		case 2:
 			printf("Введено не число\n");
 			cinClear();
 			system("pause");
-			break;
+			return;
 		}		
-	}
+	}*/
 
 	employees[i].salary =
 		salary(employees[i].workedHoursPerMonth, employees[i].hourlyRate);
@@ -304,13 +350,13 @@ void fillEmloyeesArray(Employee* employees, int size)
 	{
 		printf("size > MAX\n");
 		system("pause");
-		return;
+		exit(2);
 	}
 	if (size < 0)
 	{
 		printf("size < 0\n");
 		system("pause");
-		return;
+		exit(2);
 	}
 	srand(time(0));
 	int minHour{ 130 };
@@ -318,7 +364,7 @@ void fillEmloyeesArray(Employee* employees, int size)
 	int minRate{ 10 };
 	int maxRate{ 20 };	
 
-	string names[20][3] =
+	std::string names[20][3] =
 	{
 		{"Борисова", "Александра", "Артёмовна"},
 		{"Королева", "Анна", "Михайловна"},
@@ -368,7 +414,7 @@ Employee* deleteData(Employee* employees, int index)
 	{
 		tempEmployees = new Employee[MAX];
 	}
-	catch (const bad_alloc& e)
+	catch (const std::bad_alloc& e)
 	{
 		printf("Выделение памяти не удалось: %s\n", e.what());
 		printf("Данные не удалены\n");
@@ -433,13 +479,13 @@ Employee* deleteData(Employee* employees)
 		printf("Для подтверждения введите: 1\n");
 		printf("Отмена: любой другой символ\n");
 
-		cin >> option;
-		if (!cin)
+		std::cin >> option;
+		if (!std::cin)
 		{
 			cinClear();
 			continue;
 		}
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 		if (option == 1)
 		{
@@ -473,14 +519,13 @@ void editData(Employee& employee)
 
 		try
 		{
-			// cin.ignore();
 ;			switch (option)
 			{
 			case 1:
 				printf("Введите новую фамилию (не более %d символов): ",
 					Employee::cinLineLength);
-				cin.getline(employee.lastName, Employee::lineLength);
-				if (!cin && cin.gcount() == Employee::cinLineLength)
+				std::cin.getline(employee.lastName, Employee::lineLength);
+				if (!std::cin && std::cin.gcount() == Employee::cinLineLength)
 				{
 					strcpy_s(employee.lastName, baseEmployee.lastName);
 					throw 1;
@@ -491,8 +536,8 @@ void editData(Employee& employee)
 			case 2:
 				printf("Введите новое имя (не более %d символов): ",
 					Employee::cinLineLength);
-				cin.getline(employee.name, Employee::lineLength);
-				if (!cin && cin.gcount() == Employee::cinLineLength)
+				std::cin.getline(employee.name, Employee::lineLength);
+				if (!std::cin && std::cin.gcount() == Employee::cinLineLength)
 				{
 					strcpy_s(employee.name, baseEmployee.name);
 					throw 1;
@@ -503,8 +548,8 @@ void editData(Employee& employee)
 			case 3:
 				printf("Введите новое отчество (не более %d символов): ",
 					Employee::cinLineLength);
-				cin.getline(employee.patronymic, Employee::lineLength);
-				if (!cin && cin.gcount() == Employee::cinLineLength)
+				std::cin.getline(employee.patronymic, Employee::lineLength);
+				if (!std::cin && std::cin.gcount() == Employee::cinLineLength)
 				{
 					strcpy_s(employee.patronymic, baseEmployee.patronymic);
 					throw 1;
@@ -514,8 +559,8 @@ void editData(Employee& employee)
 				break;
 			case 4:
 				printf("Введите количество проработанных часов: ");
-				cin >> employee.workedHoursPerMonth;
-				if (!cin)
+				std::cin >> employee.workedHoursPerMonth;
+				if (!std::cin)
 				{
 					employee.workedHoursPerMonth = baseEmployee.workedHoursPerMonth;
 					throw 2;
@@ -527,8 +572,8 @@ void editData(Employee& employee)
 				break;
 			case 5:
 				printf("Введите новый почасовой тариф: ");
-				cin >> employee.hourlyRate;
-				if (!cin)
+				std::cin >> employee.hourlyRate;
+				if (!std::cin)
 				{
 					employee.hourlyRate = baseEmployee.hourlyRate;
 					throw 2;
@@ -606,7 +651,7 @@ bool filenameInput(char* filename)
 	int i{};
 	for (; i < getlineFilenameBuffer; i++)
 	{
-		cin.get(ch);
+		std::cin.get(ch);
 		if (ch == '\n')
 		{
 			filename[i] = '\0';
@@ -617,7 +662,7 @@ bool filenameInput(char* filename)
 		{
 			filename[i] = '\0';
 			strcat_s(filename, fullFileNameBuffer, extension);
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			return true;
 		}
 		if (ch == '\\'
@@ -631,14 +676,14 @@ bool filenameInput(char* filename)
 			|| ch == '|')
 		{
 			printf("Имя файла не может содержать символы: \\ / : * ? \" < > |\n");
-			cin.ignore(numeric_limits<streamsize>::max(), '\n');
+			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			return false;
 		}
 		
 		filename[i] = ch;
 	}
 	printf("Превышена максимальная длина имени файла\n");
-	cin.ignore(numeric_limits<streamsize>::max(), '\n');
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	return false;
 }
 
@@ -674,8 +719,8 @@ void save(Employee* employees)
 		printf("Нет: любой другой символ\n");
 
 		int option{};
-		cin >> option;
-		if (!cin)
+		std::cin >> option;
+		if (!std::cin)
 		{
 			cinClear();
 			if (fclose(file))
@@ -685,7 +730,7 @@ void save(Employee* employees)
 			}
 			return;
 		}
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
 		if (option != 1)
 		{
@@ -818,7 +863,7 @@ void sortSalaries(Employee* employees)
 	{
 		salaries = new Employee[countDefinedEmployees];
 	}
-	catch (const bad_alloc& e)
+	catch (const std::bad_alloc& e)
 	{
 		printf("Выделение памяти не удалось: %s\n", e.what());
 		printf("Динамический массив не создан\n");
@@ -861,7 +906,7 @@ int main()
 	{
 		employees = new Employee[MAX];
 	}
-	catch (const bad_alloc& e)
+	catch (const std::bad_alloc& e)
 	{
 		printf("Выделение памяти не удалось: %s\n", e.what());
 		printf("Динамический массив не создан\n");
@@ -869,7 +914,7 @@ int main()
 		return 1;
 	}
 
-	fillEmloyeesArray(employees, 4);
+	fillEmloyeesArray(employees, 11);
 
 	while (true)
 	{
