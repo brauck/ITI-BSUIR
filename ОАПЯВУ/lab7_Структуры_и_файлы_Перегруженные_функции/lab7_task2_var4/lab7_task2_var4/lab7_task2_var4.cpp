@@ -12,7 +12,7 @@ const int overWork{ 144 };		  // Порог сверхурочного врем�
 const int incomeTax{ 10 };		  // Подоходный налог
 const char extension[]{ ".bin" };
 // Допустимый размер вводимого имени файла
-const int cinFilenameLength{ 5 };
+const int cinFilenameLength{ 100 };
 // Имя файла + терминатор
 const int getlineFilenameBuffer{ cinFilenameLength + 1 }; // + '\0'
 // Имя файла + расширение + терминатор
@@ -914,7 +914,7 @@ int main()
 		return 1;
 	}
 
-	fillEmloyeesArray(employees, 11);
+	fillEmloyeesArray(employees, 5);
 
 	while (true)
 	{

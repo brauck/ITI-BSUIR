@@ -67,5 +67,6 @@ BenchmarkDotNet.Artifacts
 777*
 cube_test*
 string.txt
+Сотрудники.bin
 **/x64/
 *.vcxproj*
