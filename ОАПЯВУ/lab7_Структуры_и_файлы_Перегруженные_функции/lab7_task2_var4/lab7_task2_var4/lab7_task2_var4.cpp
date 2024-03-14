@@ -5,18 +5,15 @@
 #include <Windows.h>
 #include <limits>
 #include <string>
+#include <regex>
+#include <filesystem>
 #undef max
 
 const int MAX{ 20 };              // Размер массива
 const int overWork{ 144 };		  // Порог сверхурочного времени
 const int incomeTax{ 10 };		  // Подоходный налог
 const char extension[]{ ".bin" };
-// Допустимый размер вводимого имени файла
-const int cinFilenameLength{ 100 };
-// Имя файла + терминатор
-const int getlineFilenameBuffer{ cinFilenameLength + 1 }; // + '\0'
-// Имя файла + расширение + терминатор
-const int fullFileNameBuffer{ getlineFilenameBuffer + (sizeof(extension) - 1) }; // + .bin + '\0'
+const int getlineFilenameBuffer{ MAX_PATH - sizeof(extension) + 1 }; // + '\0'
 int countDefinedEmployees{};	  // Счетчик существующих сотрудников
 
 struct Employee
@@ -227,7 +224,7 @@ bool offerInput(const char* message, int& data, bool& isContinue)
 		system("pause");
 		return false;
 	}
-	if (!data) isContinue = false;
+	if (data < 0) isContinue = false;
 	return true;
 }
 
@@ -281,51 +278,14 @@ void addData(Employee* employees)
 	if (!isContinue) return;
 	while (!offerInput("Введите отчество", employees[i].patronymic, isContinue));
 	if (!isContinue) return;
-	while (!offerInput("Введите количество проработанных часов за месяц",
+	const char* message{"Для выхода в гланое меню: отрицательное число"};
+	while (!offerInput("Введите количество проработанных часов за месяц\nотрицательное число: в гланое меню:",
 		employees[i].workedHoursPerMonth, isContinue));
 	if (!isContinue) return;
-	while (!offerInput("Введите почасовой тариф", employees[i].hourlyRate, isContinue));
+	while (!offerInput("Введите почасовой тариф\nотрицательное число: в гланое меню:",
+		employees[i].hourlyRate, isContinue));
 	if (!isContinue) return;
-	/*try
-	{
-		printf("Введите фамилию: ");
-		std::cin.getline(employees[i].lastName, Employee::lineLength);
-		if (!std::cin && std::cin.gcount() == Employee::cinLineLength) throw 1;
-
-		printf("\nВведите имя: ");
-		std::cin.getline(employees[i].name, Employee::lineLength);
-		if (!std::cin && std::cin.gcount() == Employee::cinLineLength) throw 1;
-
-		printf("\nВведите отчество: ");
-		std::cin.getline(employees[i].patronymic, Employee::lineLength);
-		if (!std::cin && std::cin.gcount() == Employee::cinLineLength) throw 1;
-
-		printf("\nВведите количество проработанных часов за месяц: ");
-		std::cin >> employees[i].workedHoursPerMonth;
-		if (!std::cin) throw 2;
-
-		printf("\nВведите почасовой тариф: ");
-		std::cin >> employees[i].hourlyRate;
-		if (!std::cin) throw 2;
-	}
-	catch (int i)
-	{
-		switch (i)
-		{
-		case 1:
-			printf("Превышено допустимое количество вводимых символов: %d\n",
-				Employee::cinLineLength);
-			cinClear();
-			system("pause");
-			return;
-		case 2:
-			printf("Введено не число\n");
-			cinClear();
-			system("pause");
-			return;
-		}		
-	}*/
-
+	
 	employees[i].salary =
 		salary(employees[i].workedHoursPerMonth, employees[i].hourlyRate);
 
@@ -560,7 +520,7 @@ void editData(Employee& employee)
 			case 4:
 				printf("Введите количество проработанных часов: ");
 				std::cin >> employee.workedHoursPerMonth;
-				if (!std::cin)
+				if (!std::cin || employee.workedHoursPerMonth < 0)
 				{
 					employee.workedHoursPerMonth = baseEmployee.workedHoursPerMonth;
 					throw 2;
@@ -573,7 +533,7 @@ void editData(Employee& employee)
 			case 5:
 				printf("Введите новый почасовой тариф: ");
 				std::cin >> employee.hourlyRate;
-				if (!std::cin)
+				if (!std::cin || employee.hourlyRate < 0)
 				{
 					employee.hourlyRate = baseEmployee.hourlyRate;
 					throw 2;
@@ -599,7 +559,7 @@ void editData(Employee& employee)
 				system("pause");
 				break;
 			case 2:
-				printf("Введено не число\n");
+				printf("Введено не число, либо отрицательное число\n");
 				cinClear();
 				system("pause");
 				break;
@@ -642,11 +602,67 @@ void editData(Employee* employees)
 }
 // ----------------------------------------
 
+// Формирование пути имени файла
+//bool pathInput(std::string& s)
+//{
+//	std::filesystem::path filenamePath("");
+//	char directory[MAX_PATH]{};
+//	//std::string s{};
+//	std::cin.getline(directory, MAX_PATH);
+//	if (!std::cin && std::cin.gcount() == MAX_PATH - 1) // - '\0'
+//	{
+//		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
+//		cinClear();
+//		system("pause");
+//		return false;
+//	}
+//	
+//	for (int i = 0; i < strlen(directory); i++)
+//	{
+//		if (directory[i] == '\\') directory[i] = '/';
+//	}
+//
+//	std::smatch sm{};
+//	//if (std::regex_search(s, sm, std::regex("[a-zA-Z]:")))
+//	std::regex_search(s, sm, std::regex("[^\"]*[^\"|/]"));
+//	{
+//		s = (sm[0].str());
+//		filenamePath /= std::filesystem::path(s);
+//	}
+//	std::cout << "infunc " << s << s.size() << '\n' << filenamePath << sm.length() << std::endl;
+//	system("pause");
+//	//std::regex_search(directory, cm, std::regex("[^\"]*[^\"|/]"));
+//	return true;
+//}
+
+std::cmatch pathParcing()
+{
+	std::cmatch cm{};
+	char directory[MAX_PATH]{};
+	std::cin.getline(directory, MAX_PATH);
+
+	if (!std::cin && std::cin.gcount() == MAX_PATH - 1) // - '\0'
+	{
+		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
+		cinClear();
+		system("pause");
+		return cm;
+	}
+
+	for (int i = 0; i < strlen(directory); i++)
+	{
+		if (directory[i] == '\\') directory[i] = '/';
+	}
+	
+	if (std::regex_search(directory, cm, std::regex("[a-zA-Z]:"))) return cm;
+	if (std::regex_search(directory, cm, std::regex("[^\"]*[^\"|/]"))) return cm;
+	return cm;
+}
+
 // Проверка корректности ввода имени файла
 // Допустимо вводить с расширением ('.' и следующие за ней символы игнорируются)
 bool filenameInput(char* filename)
 {
-	printf("Максимальная длина имени файла: %d\n", cinFilenameLength);
 	char ch{};
 	int i{};
 	for (; i < getlineFilenameBuffer; i++)
@@ -655,13 +671,13 @@ bool filenameInput(char* filename)
 		if (ch == '\n')
 		{
 			filename[i] = '\0';
-			strcat_s(filename, fullFileNameBuffer, extension);
+			strcat_s(filename, MAX_PATH, extension);
 			return true;
 		}
 		if (ch == '.')
 		{
 			filename[i] = '\0';
-			strcat_s(filename, fullFileNameBuffer, extension);
+			strcat_s(filename, MAX_PATH, extension);
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			return true;
 		}
@@ -687,10 +703,42 @@ bool filenameInput(char* filename)
 	return false;
 }
 
-// Запись массива в файл (бинарный) -------
+// Запись массива в файл (бинарный) -----------------------------------
 void save(Employee* employees)
 {
-	char filename[fullFileNameBuffer]{};
+	std::string currentPath{ std::filesystem::current_path().string() };
+	std::string stringDirectory{};
+	char directory[MAX_PATH]{};
+	std::cmatch parcedPath = pathParcing();
+	printf("Введите путь директории для сохранения: ");
+	if (parcedPath.empty())
+	{
+		strcpy_s(directory, currentPath.c_str());
+	}
+	else if (parcedPath.str()[1] == ':')
+	{
+		stringDirectory = parcedPath.str();
+	}
+	else if (parcedPath.str()[0] == '/')
+	{
+		stringDirectory = currentPath[0] + ':';
+		stringDirectory += parcedPath.str();
+	}
+	else
+	{
+		stringDirectory = currentPath + '/' + parcedPath.str();
+	}
+	if (stringDirectory.size() > MAX_PATH)
+	{
+		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
+		system("pause");
+		return;
+	}
+	strcpy_s(directory, stringDirectory.c_str());
+
+	std::filesystem::path pathForFile(" ");
+
+	char filename[MAX_PATH]{};
 	printf("Введите имя файла для сохранения: ");
 	if (!filenameInput(filename))
 	{
@@ -775,7 +823,7 @@ void save(Employee* employees)
 // Считывание массива из файла ------------------------------
 bool load(Employee* employees)
 {	
-	char filename[fullFileNameBuffer]{};
+	char filename[MAX_PATH]{};
 	printf("Введите имя файла для загрузки: ");
 	if (!filenameInput(filename))
 	{
@@ -898,7 +946,69 @@ void sortSalaries(Employee* employees)
 int main()
 {
 	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);
+	SetConsoleOutputCP(1251);	
+
+	//char sss[MAX_PATH]{ "\"C:/Users/60032/Desktop/ITI-BSUIR/ОАПЯВУ/lab7_Структуры_и_файлы_Перегруженные_функции/lab7_task2_var4/lab7_task2_var4/тест1/тест2////\"" };
+	//std::string sss{ "\"C:/Users/60032/Desktop/ITI-BSUIR/ОАПЯВУ/lab7_Структуры_и_файлы_Перегруженные_функции/lab7_task2_var4/lab7_task2_var4/тест1/тест2////\"" };
+	char sss[MAX_PATH]{ "\"g//\"" };
+
+	char rr[MAX_PATH]{};
+	char* ch{};
+	//std::smatch sm;
+	std::cmatch cm;
+	//if (std::regex_search(sss, sm, std::regex("[^\"]*[^\"|/]"))) std::cout << "found\n" << sm[0].length() << ' ' << sss.size() << std::endl;
+	//std::cout << std::filesystem::current_path().string()[1] << std::endl;
+	
+	if (std::regex_search(sss, cm, std::regex("[^\"]*[^\"|/]"))) std::cout << "found\n" << cm[0].str() << ' ' << std::endl;
+	std::cout << cm.str()[1] << std::endl;
+	//std::cout << ch << std::endl;
+	//if (std::regex_search(sss, cm, std::regex("[_[:alnum:]].*?((?=/)|(?=\"))"))) std::cout << "found\n";
+	//std::regex_search(sss, cm, std::regex("[a-zA-Z]:"));
+	
+	//std::cout << pathForFile.relative_path();
+	if (std::filesystem::exists("kl\\kll\\klll"))
+	{
+		std::cout << "exists";
+	}
+	else
+	{
+		std::cout << "NOTexists";
+	}
+	try
+	{
+		if (std::filesystem::exists("f:"))
+		{
+			std::cout << "exists";
+		}
+		else
+		{
+			std::cout << "NOTexists";
+		}
+
+		//std::filesystem::path pathForFile("a/b");
+		//std::cout << pathForFile;
+		/*if (create_directories(pathForFile))
+		{
+			std::cout << "\ntrue" << std::endl;
+		}
+		else
+		{
+			std::cout << "\nfalse" << std::endl;
+		}*/
+	}
+	catch (std::filesystem::filesystem_error const& ex)
+	{
+		std::cout << std::filesystem::current_path();
+		std::cout << "what():  " << ex.what() << '\n'
+			<< "path1(): " << ex.path1() << '\n'
+			<< "path2(): " << ex.path2() << '\n'
+			<< "code().value():    " << ex.code().value() << '\n'
+			<< "code().message():  " << ex.code().message() << '\n'
+			<< "code().category(): " << ex.code().category().name() << '\n';
+	}
+
+	system("pause");
+	return 0;
 
 	Employee* employees{ nullptr };
 	Employee* tempEmployees{ nullptr };
