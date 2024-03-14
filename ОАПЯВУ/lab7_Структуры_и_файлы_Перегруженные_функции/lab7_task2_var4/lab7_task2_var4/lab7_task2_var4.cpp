@@ -1,4 +1,5 @@
-﻿// Lab #7
+﻿// c++17
+// Lab #7
 // task #2
 // variant #4
 #include <iostream>
@@ -13,7 +14,6 @@ const int MAX{ 20 };              // Размер массива
 const int overWork{ 144 };		  // Порог сверхурочного времени
 const int incomeTax{ 10 };		  // Подоходный налог
 const char extension[]{ ".bin" };
-const int getlineFilenameBuffer{ MAX_PATH - sizeof(extension) + 1 }; // + '\0'
 int countDefinedEmployees{};	  // Счетчик существующих сотрудников
 
 struct Employee
@@ -635,10 +635,15 @@ void editData(Employee* employees)
 //	return true;
 //}
 
-std::cmatch pathParcing()
+bool pathParcing(std::string& path, const bool createFolder)
 {
 	std::cmatch cm{};
 	char directory[MAX_PATH]{};
+	std::string currentPath{ std::filesystem::current_path().string() };
+	for (auto& symbol : currentPath)
+	{
+		if (symbol == '\\') symbol = '/';
+	}
 	std::cin.getline(directory, MAX_PATH);
 
 	if (!std::cin && std::cin.gcount() == MAX_PATH - 1) // - '\0'
@@ -646,7 +651,7 @@ std::cmatch pathParcing()
 		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
 		cinClear();
 		system("pause");
-		return cm;
+		return false;
 	}
 
 	for (int i = 0; i < strlen(directory); i++)
@@ -654,30 +659,98 @@ std::cmatch pathParcing()
 		if (directory[i] == '\\') directory[i] = '/';
 	}
 	
-	if (std::regex_search(directory, cm, std::regex("[a-zA-Z]:"))) return cm;
-	if (std::regex_search(directory, cm, std::regex("[^\"]*[^\"|/]"))) return cm;
-	return cm;
+	do
+	{
+		if (std::regex_search(directory, cm, std::regex("[^\"]*[^\"|/]")))
+		{
+			if (cm.str()[0] == '/')
+			{
+				path = currentPath[0];
+				path += (':' + cm.str());
+				break;
+			}
+			if (cm.str()[1] == ':')
+			{
+				path = cm.str();
+				break;
+			}
+			path = currentPath + '/' + cm.str();
+			break;
+		}
+
+		if (cm.empty())
+		{
+			path = currentPath;
+			break;
+		}
+	} while (false);
+
+	if (path.size() > MAX_PATH - 1) // - '\0'
+	{
+		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
+		system("pause");
+		return false;
+	}
+	
+	if (!createFolder) return true;
+
+	if (!std::filesystem::exists(path))
+	{
+		printf("Такой директории не существует.\n");
+		printf("Создать директорию?\n");
+		printf("Да: введите 1\n");
+		printf("Нет: любой другой символ\n");
+
+		int option{};
+		std::cin >> option;
+		if (!std::cin) return false;
+		if (option != 1) return false;
+	}
+
+	try
+	{
+		if (std::filesystem::create_directories(path))
+		{
+			std::cout << "\ntrue" << std::endl;
+		}
+		else
+		{
+			std::cout << "\nfalse" << std::endl;
+		}
+	}
+	catch (std::filesystem::filesystem_error const& ex)
+	{
+		std::cout << std::filesystem::current_path();
+		std::cout << "what():  " << ex.what() << '\n'
+			<< "path1(): " << ex.path1() << '\n'
+			<< "path2(): " << ex.path2() << '\n'
+			<< "code().value():    " << ex.code().value() << '\n'
+			<< "code().message():  " << ex.code().message() << '\n'
+			<< "code().category(): " << ex.code().category().name() << '\n';
+	}
+
+	return true;
 }
 
 // Проверка корректности ввода имени файла
 // Допустимо вводить с расширением ('.' и следующие за ней символы игнорируются)
-bool filenameInput(char* filename)
+bool filenameInput(char* filename, int maxFileNameLength)
 {
 	char ch{};
 	int i{};
-	for (; i < getlineFilenameBuffer; i++)
+	for (; i < maxFileNameLength - strlen(extension); i++)
 	{
 		std::cin.get(ch);
 		if (ch == '\n')
 		{
 			filename[i] = '\0';
-			strcat_s(filename, MAX_PATH, extension);
+			strcat_s(filename, maxFileNameLength, extension);
 			return true;
 		}
 		if (ch == '.')
 		{
 			filename[i] = '\0';
-			strcat_s(filename, MAX_PATH, extension);
+			strcat_s(filename, maxFileNameLength, extension);
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			return true;
 		}
@@ -695,57 +768,50 @@ bool filenameInput(char* filename)
 			std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 			return false;
 		}
-		
 		filename[i] = ch;
 	}
 	printf("Превышена максимальная длина имени файла\n");
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	return false;
 }
-
 // Запись массива в файл (бинарный) -----------------------------------
 void save(Employee* employees)
 {
-	std::string currentPath{ std::filesystem::current_path().string() };
-	std::string stringDirectory{};
-	char directory[MAX_PATH]{};
-	std::cmatch parcedPath = pathParcing();
-	printf("Введите путь директории для сохранения: ");
-	if (parcedPath.empty())
-	{
-		strcpy_s(directory, currentPath.c_str());
-	}
-	else if (parcedPath.str()[1] == ':')
-	{
-		stringDirectory = parcedPath.str();
-	}
-	else if (parcedPath.str()[0] == '/')
-	{
-		stringDirectory = currentPath[0] + ':';
-		stringDirectory += parcedPath.str();
-	}
-	else
-	{
-		stringDirectory = currentPath + '/' + parcedPath.str();
-	}
-	if (stringDirectory.size() > MAX_PATH)
-	{
-		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
-		system("pause");
-		return;
-	}
-	strcpy_s(directory, stringDirectory.c_str());
+	const bool createFolder{ true };
+	int maxFileNameLength{};
+	std::string path{};
+	//"C:/Users/60032/Desktop/ITI-BSUIR/ОАПЯВУ/lab7_Структуры_и_файлы_Перегруженные_функции/lab7_task2_var4/lab7_task2_var4/тест1/тест2////"
+	//"C:\Users\60032\Desktop\ITI-BSUIR\ОАПЯВУ\lab7_Структуры_и_файлы_Перегруженные_функции\lab7_task2_var4\lab7_task2_var4\тест1\тест2\\\"
+	//"C:\\Users\60032\\Desktop\\ITI-BSUIR\\ОАПЯВУ\\lab7_Структуры_и_файлы_Перегруженные_функции\\lab7_task2_var4\\lab7_task2_var4\\тест1\\тест2\\\"
+	
+	printf("Введите путь директории для сохранения:\n");
+	printf("Enter - сохранить в текущей директории: ");
+	std::cout << std::filesystem::current_path().string() << std::endl;
 
-	std::filesystem::path pathForFile(" ");
+	if (!pathParcing(path, createFolder)) return;
 
-	char filename[MAX_PATH]{};
-	printf("Введите имя файла для сохранения: ");
-	if (!filenameInput(filename))
+	maxFileNameLength = MAX_PATH - path.size();
+	std::cout << path << ' ' << path.size() << ' ' << sizeof(path) << ' ' << maxFileNameLength << std::endl;
+	
+	char* filename = new char[maxFileNameLength];
+	printf("Введите имя файла для сохранения (не более %d символов): ",
+		maxFileNameLength - strlen(extension));
+	if (!filenameInput(filename, maxFileNameLength))
 	{
 		printf("Данные не сохранены\n");
 		system("pause");
+		delete[] filename;		
 		return;
 	}
+
+	path += '/';
+	path += filename;
+	std::cout << path << std::endl;
+	delete[] filename;
+	filename = nullptr;
+
+	system("pause");
+	return;
 
 	char* b{ nullptr };
 	FILE* file;
@@ -823,7 +889,7 @@ void save(Employee* employees)
 // Считывание массива из файла ------------------------------
 bool load(Employee* employees)
 {	
-	char filename[MAX_PATH]{};
+	/*char filename[MAX_PATH]{};
 	printf("Введите имя файла для загрузки: ");
 	if (!filenameInput(filename))
 	{
@@ -865,6 +931,7 @@ bool load(Employee* employees)
 	}
 
 	system("pause");
+	return true;*/
 	return true;
 }
 // ----------------------------------------------------------
@@ -953,6 +1020,7 @@ int main()
 	char sss[MAX_PATH]{ "\"g//\"" };
 
 	char rr[MAX_PATH]{};
+	strcpy_s(rr, "afsfd");
 	char* ch{};
 	//std::smatch sm;
 	std::cmatch cm;
@@ -1007,8 +1075,8 @@ int main()
 			<< "code().category(): " << ex.code().category().name() << '\n';
 	}
 
-	system("pause");
-	return 0;
+	/*system("pause");
+	return 0;*/
 
 	Employee* employees{ nullptr };
 	Employee* tempEmployees{ nullptr };
