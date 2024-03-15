@@ -197,17 +197,16 @@ void showData(Employee* employees)
 // Предложение ввода фамилии, имени, отчества
 bool offerInput(const char* message, char* data, bool& isContinue)
 {
-	printf("%s :", message);
+	printf("\n%s (0 - отмена):", message);
 	std::cin.getline(data, Employee::lineLength);
 	if (!std::cin && std::cin.gcount() == Employee::cinLineLength)
 	{
 		printf("Превышено допустимое количество вводимых символов: %d\n",
 			Employee::cinLineLength);
 		cinClear();
-		system("pause");
 		return false;
 	}
-	if (data[0] == '0') isContinue = false;
+	if (data[0] == '0' && strlen(data) == 1) isContinue = false;
 	return true;
 }
 
@@ -215,15 +214,16 @@ bool offerInput(const char* message, char* data, bool& isContinue)
 // почасового тарифа
 bool offerInput(const char* message, int& data, bool& isContinue)
 {
-	printf("%s :", message);
+	printf("\n%s\n(отрицательное число - отмена):", message);
 	std::cin >> data;
 	if (!std::cin)
 	{
 		printf("Введено не число\n");
 		cinClear();
-		system("pause");
 		return false;
 	}
+	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
 	if (data < 0) isContinue = false;
 	return true;
 }
@@ -269,8 +269,9 @@ void addData(Employee* employees)
 	const int i = countDefinedEmployees;	
 	
 	if (!addDataMenu()) return;
-	
-	printf("Допустимое количество вводимых символов: %d\n\n", Employee::cinLineLength);
+
+	system("cls");
+	printf("Допустимое количество вводимых символов: %d\n", Employee::cinLineLength);
 
 	while(!offerInput("Введите фамилию", employees[i].lastName, isContinue));
 	if (!isContinue) return;
@@ -278,11 +279,10 @@ void addData(Employee* employees)
 	if (!isContinue) return;
 	while (!offerInput("Введите отчество", employees[i].patronymic, isContinue));
 	if (!isContinue) return;
-	const char* message{"Для выхода в гланое меню: отрицательное число"};
-	while (!offerInput("Введите количество проработанных часов за месяц\nотрицательное число: в гланое меню:",
+	while (!offerInput("Введите количество проработанных часов за месяц",
 		employees[i].workedHoursPerMonth, isContinue));
 	if (!isContinue) return;
-	while (!offerInput("Введите почасовой тариф\nотрицательное число: в гланое меню:",
+	while (!offerInput("Введите почасовой тариф",
 		employees[i].hourlyRate, isContinue));
 	if (!isContinue) return;
 	
@@ -318,7 +318,7 @@ void fillEmloyeesArray(Employee* employees, int size)
 		system("pause");
 		exit(2);
 	}
-	srand(time(0));
+	srand(static_cast<unsigned int>(time(0)));
 	int minHour{ 130 };
 	int maxHour{ 160 };
 	int minRate{ 10 };
@@ -376,7 +376,7 @@ Employee* deleteData(Employee* employees, int index)
 	}
 	catch (const std::bad_alloc& e)
 	{
-		printf("Выделение памяти не удалось: %s\n", e.what());
+		std::cout << "Выделение памяти не удалось: " << e.what() << std::endl;
 		printf("Данные не удалены\n");
 		system("pause");
 		exit(1);
@@ -661,7 +661,7 @@ bool pathParcing(std::string& path, const bool createFolder)
 	
 	do
 	{
-		if (std::regex_search(directory, cm, std::regex("[^\"]*[^\"|/]")))
+		if (std::regex_search(directory, cm, std::regex("[^\"]*[^\"/]")))
 		{
 			if (cm.str()[0] == '/')
 			{
@@ -703,31 +703,31 @@ bool pathParcing(std::string& path, const bool createFolder)
 
 		int option{};
 		std::cin >> option;
-		if (!std::cin) return false;
-		if (option != 1) return false;
-	}
+		if (!std::cin)
+		{
+			cinClear();
+			return false;
+		}
+		std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 
-	try
-	{
-		if (std::filesystem::create_directories(path))
+		if (option != 1) return false;
+
+		try
 		{
-			std::cout << "\ntrue" << std::endl;
+			if (!std::filesystem::create_directories(path))
+			{
+				printf("Не удалось создать директорию\n");
+				system("pause");
+				return false;
+			}
 		}
-		else
+		catch (std::filesystem::filesystem_error const& e)
 		{
-			std::cout << "\nfalse" << std::endl;
+			std::cout << "Не удалось создать директорию:\n" << e.what() << std::endl;
+			system("pause");
+			return false;
 		}
-	}
-	catch (std::filesystem::filesystem_error const& ex)
-	{
-		std::cout << std::filesystem::current_path();
-		std::cout << "what():  " << ex.what() << '\n'
-			<< "path1(): " << ex.path1() << '\n'
-			<< "path2(): " << ex.path2() << '\n'
-			<< "code().value():    " << ex.code().value() << '\n'
-			<< "code().message():  " << ex.code().message() << '\n'
-			<< "code().category(): " << ex.code().category().name() << '\n';
-	}
+	}	
 
 	return true;
 }
@@ -774,6 +774,7 @@ bool filenameInput(char* filename, int maxFileNameLength)
 	std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 	return false;
 }
+
 // Запись массива в файл (бинарный) -----------------------------------
 void save(Employee* employees)
 {
@@ -785,33 +786,33 @@ void save(Employee* employees)
 	//"C:\\Users\60032\\Desktop\\ITI-BSUIR\\ОАПЯВУ\\lab7_Структуры_и_файлы_Перегруженные_функции\\lab7_task2_var4\\lab7_task2_var4\\тест1\\тест2\\\"
 	
 	printf("Введите путь директории для сохранения:\n");
-	printf("Enter - сохранить в текущей директории: ");
+	printf("(Enter - сохранить в текущей директории): ");
 	std::cout << std::filesystem::current_path().string() << std::endl;
 
 	if (!pathParcing(path, createFolder)) return;
 
-	maxFileNameLength = MAX_PATH - path.size();
-	std::cout << path << ' ' << path.size() << ' ' << sizeof(path) << ' ' << maxFileNameLength << std::endl;
-	
-	char* filename = new char[maxFileNameLength];
-	printf("Введите имя файла для сохранения (не более %d символов): ",
-		maxFileNameLength - strlen(extension));
-	if (!filenameInput(filename, maxFileNameLength))
+	maxFileNameLength = MAX_PATH - static_cast<int>(path.size());
+		
+	char* cinFilename = new char[maxFileNameLength];
+	std::cout << "Введите имя файла для сохранения "
+		<< "(не более " << maxFileNameLength - strlen(extension) << " символов): "
+		<< std::endl;
+
+	if (!filenameInput(cinFilename, maxFileNameLength))
 	{
 		printf("Данные не сохранены\n");
 		system("pause");
-		delete[] filename;		
+		delete[] cinFilename;
 		return;
 	}
 
 	path += '/';
-	path += filename;
-	std::cout << path << std::endl;
-	delete[] filename;
-	filename = nullptr;
+	path += cinFilename;
+	
+	delete[] cinFilename;
+	cinFilename = nullptr;
 
-	system("pause");
-	return;
+	const char* filename{ path.c_str() };
 
 	char* b{ nullptr };
 	FILE* file;
@@ -875,8 +876,14 @@ void save(Employee* employees)
 			}
 		}
 	}
-		
-	printf("Данные сохранены в: %s\n", filename);
+	
+	for (auto& symbol : path)
+	{
+		if (symbol == '/') symbol = '\\';
+	}
+
+	std::cout << "Данные сохранены в: "
+		<< std::filesystem::path(path).string() << std::endl;
 
 	if (fclose(file))
 	{
@@ -889,14 +896,44 @@ void save(Employee* employees)
 // Считывание массива из файла ------------------------------
 bool load(Employee* employees)
 {	
-	/*char filename[MAX_PATH]{};
-	printf("Введите имя файла для загрузки: ");
-	if (!filenameInput(filename))
+	const bool createFolder{ false };
+	int maxFileNameLength{};
+	std::string path{};
+	printf("Введите директорию для загрузки:\n");
+	printf("(Enter - загрузить из текущей директории): ");
+	std::cout << std::filesystem::current_path().string() << std::endl;
+
+	if (!pathParcing(path, createFolder)) return false;
+
+	if (!std::filesystem::exists(path))
 	{
-		printf("Данные не загружены\n");
+		printf("Такой директории не существует.\n");
 		system("pause");
 		return false;
 	}
+
+	maxFileNameLength = MAX_PATH - static_cast<int>(path.size());
+
+	char* cinFilename = new char[maxFileNameLength];
+	std::cout << "Введите имя файла для загрузки "
+		<< "(не более " << maxFileNameLength - strlen(extension) << " символов): "
+		<< std::endl;
+
+	if (!filenameInput(cinFilename, maxFileNameLength))
+	{
+		printf("Данные не загружены\n");
+		system("pause");
+		delete[] cinFilename;
+		return false;
+	}
+
+	path += '/';
+	path += cinFilename;
+
+	delete[] cinFilename;
+	cinFilename = nullptr;
+
+	const char* filename{ path.c_str() };
 
 	FILE* file;
 
@@ -912,7 +949,8 @@ bool load(Employee* employees)
 			sizeof(Employee) * MAX,
 			sizeof(Employee),
 			MAX,
-			file) < MAX)
+			file)
+			< MAX)
 	{
 		printf("Данные считаны неверно\n");
 		if (fclose(file))
@@ -931,7 +969,6 @@ bool load(Employee* employees)
 	}
 
 	system("pause");
-	return true;*/
 	return true;
 }
 // ----------------------------------------------------------
@@ -980,7 +1017,7 @@ void sortSalaries(Employee* employees)
 	}
 	catch (const std::bad_alloc& e)
 	{
-		printf("Выделение памяти не удалось: %s\n", e.what());
+		std::cout << "Выделение памяти не удалось: " << e.what() << std::endl;
 		printf("Динамический массив не создан\n");
 		system("pause");
 		exit(1);
@@ -1086,13 +1123,13 @@ int main()
 	}
 	catch (const std::bad_alloc& e)
 	{
-		printf("Выделение памяти не удалось: %s\n", e.what());
+		std::cout << "Выделение памяти не удалось: " << e.what() << std::endl;
 		printf("Динамический массив не создан\n");
 		system("pause");
 		return 1;
 	}
 
-	fillEmloyeesArray(employees, 5);
+	fillEmloyeesArray(employees, 7);
 
 	while (true)
 	{
