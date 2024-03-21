@@ -13,7 +13,7 @@
 const int MAX{ 20 };              // Размер массива
 const int overWork{ 144 };		  // Порог сверхурочного времени
 const int incomeTax{ 10 };		  // Подоходный налог
-const char extension[]{ ".bin" };
+const char extension[]{ ".bin" }; // Расширение по умолчанию
 int countDefinedEmployees{};	  // Счетчик существующих сотрудников
 
 struct Employee
@@ -197,7 +197,7 @@ void showData(Employee* employees)
 // Предложение ввода фамилии, имени, отчества
 bool offerInput(const char* message, char* data, bool& isContinue)
 {
-	printf("\n%s (0 - отмена):", message);
+	printf("\n%s (0 - отмена): ", message);
 	std::cin.getline(data, Employee::lineLength);
 	if (!std::cin && std::cin.gcount() == Employee::cinLineLength)
 	{
@@ -214,7 +214,7 @@ bool offerInput(const char* message, char* data, bool& isContinue)
 // почасового тарифа
 bool offerInput(const char* message, int& data, bool& isContinue)
 {
-	printf("\n%s\n(отрицательное число - отмена):", message);
+	printf("\n%s\n(отрицательное число - отмена): ", message);
 	std::cin >> data;
 	if (!std::cin)
 	{
@@ -265,42 +265,48 @@ void addData(Employee* employees)
 		return;
 	}
 
-	bool isContinue{ true };
-	const int i = countDefinedEmployees;	
+	bool isContinue{};
+	int i{};
 	
-	if (!addDataMenu()) return;
-
-	system("cls");
-	printf("Допустимое количество вводимых символов: %d\n", Employee::cinLineLength);
-
-	while(!offerInput("Введите фамилию", employees[i].lastName, isContinue));
-	if (!isContinue) return;
-	while (!offerInput("Введите имя", employees[i].name, isContinue));
-	if (!isContinue) return;
-	while (!offerInput("Введите отчество", employees[i].patronymic, isContinue));
-	if (!isContinue) return;
-	while (!offerInput("Введите количество проработанных часов за месяц",
-		employees[i].workedHoursPerMonth, isContinue));
-	if (!isContinue) return;
-	while (!offerInput("Введите почасовой тариф",
-		employees[i].hourlyRate, isContinue));
-	if (!isContinue) return;
-	
-	employees[i].salary =
-		salary(employees[i].workedHoursPerMonth, employees[i].hourlyRate);
-
-	if (employees[0].employeeID)
+	while (true)
 	{
-		employees[i].employeeID = employees[i - 1].employeeID + 1;		
-	}
-	else
-	{
-		employees[i].employeeID = 1;
-	}
+		i = countDefinedEmployees;
+		isContinue = true;
 
-	countDefinedEmployees++;
-	printf("\nСотрудник добавлен\n");
-	system("pause");
+		if (!addDataMenu()) return;
+
+		system("cls");
+		printf("\nДопустимое количество вводимых символов: %d\n", Employee::cinLineLength);
+
+		while (!offerInput("Введите фамилию", employees[i].lastName, isContinue));
+		if (!isContinue) continue;
+		while (!offerInput("Введите имя", employees[i].name, isContinue));
+		if (!isContinue) continue;
+		while (!offerInput("Введите отчество", employees[i].patronymic, isContinue));
+		if (!isContinue) continue;
+		while (!offerInput("Введите количество проработанных часов за месяц",
+			employees[i].workedHoursPerMonth, isContinue));
+		if (!isContinue) continue;
+		while (!offerInput("Введите почасовой тариф",
+			employees[i].hourlyRate, isContinue));
+		if (!isContinue) continue;
+
+		employees[i].salary =
+			salary(employees[i].workedHoursPerMonth, employees[i].hourlyRate);
+
+		if (employees[0].employeeID)
+		{
+			employees[i].employeeID = employees[i - 1].employeeID + 1;
+		}
+		else
+		{
+			employees[i].employeeID = 1;
+		}
+
+		countDefinedEmployees++;
+		printf("\nСотрудник добавлен\n");
+		system("pause");
+	}	
 }
 
 // Заполнение массива начальными данными
@@ -603,49 +609,18 @@ void editData(Employee* employees)
 // ----------------------------------------
 
 // Формирование пути имени файла
-//bool pathInput(std::string& s)
-//{
-//	std::filesystem::path filenamePath("");
-//	char directory[MAX_PATH]{};
-//	//std::string s{};
-//	std::cin.getline(directory, MAX_PATH);
-//	if (!std::cin && std::cin.gcount() == MAX_PATH - 1) // - '\0'
-//	{
-//		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
-//		cinClear();
-//		system("pause");
-//		return false;
-//	}
-//	
-//	for (int i = 0; i < strlen(directory); i++)
-//	{
-//		if (directory[i] == '\\') directory[i] = '/';
-//	}
-//
-//	std::smatch sm{};
-//	//if (std::regex_search(s, sm, std::regex("[a-zA-Z]:")))
-//	std::regex_search(s, sm, std::regex("[^\"]*[^\"|/]"));
-//	{
-//		s = (sm[0].str());
-//		filenamePath /= std::filesystem::path(s);
-//	}
-//	std::cout << "infunc " << s << s.size() << '\n' << filenamePath << sm.length() << std::endl;
-//	system("pause");
-//	//std::regex_search(directory, cm, std::regex("[^\"]*[^\"|/]"));
-//	return true;
-//}
-
 bool pathParcing(std::string& path, const bool createFolder)
 {
 	std::cmatch cm{};
 	char directory[MAX_PATH]{};
 	std::string currentPath{ std::filesystem::current_path().string() };
+
 	for (auto& symbol : currentPath)
 	{
 		if (symbol == '\\') symbol = '/';
 	}
-	std::cin.getline(directory, MAX_PATH);
 
+	std::cin.getline(directory, MAX_PATH);
 	if (!std::cin && std::cin.gcount() == MAX_PATH - 1) // - '\0'
 	{
 		printf("Превышена максимальная длина пути: %d\n", MAX_PATH);
@@ -661,6 +636,8 @@ bool pathParcing(std::string& path, const bool createFolder)
 	
 	do
 	{
+		// Игнорирование двойных кавычек
+		// Игнорирование символа '/', если введен последним
 		if (std::regex_search(directory, cm, std::regex("[^\"]*[^\"/]")))
 		{
 			if (cm.str()[0] == '/')
@@ -692,6 +669,7 @@ bool pathParcing(std::string& path, const bool createFolder)
 		return false;
 	}
 	
+	// Выполняется, если нужно создать новую папку
 	if (!createFolder) return true;
 
 	if (!std::filesystem::exists(path))
@@ -781,9 +759,6 @@ void save(Employee* employees)
 	const bool createFolder{ true };
 	int maxFileNameLength{};
 	std::string path{};
-	//"C:/Users/60032/Desktop/ITI-BSUIR/ОАПЯВУ/lab7_Структуры_и_файлы_Перегруженные_функции/lab7_task2_var4/lab7_task2_var4/тест1/тест2////"
-	//"C:\Users\60032\Desktop\ITI-BSUIR\ОАПЯВУ\lab7_Структуры_и_файлы_Перегруженные_функции\lab7_task2_var4\lab7_task2_var4\тест1\тест2\\\"
-	//"C:\\Users\60032\\Desktop\\ITI-BSUIR\\ОАПЯВУ\\lab7_Структуры_и_файлы_Перегруженные_функции\\lab7_task2_var4\\lab7_task2_var4\\тест1\\тест2\\\"
 	
 	printf("Введите путь директории для сохранения:\n");
 	printf("(Enter - сохранить в текущей директории): ");
@@ -813,7 +788,6 @@ void save(Employee* employees)
 	cinFilename = nullptr;
 
 	const char* filename{ path.c_str() };
-
 	char* b{ nullptr };
 	FILE* file;
 
@@ -936,7 +910,6 @@ bool load(Employee* employees)
 	const char* filename{ path.c_str() };
 
 	FILE* file;
-
 	if (fopen_s(&file, filename, "rb"))
 	{
 		printf("Ошибка открытия файла: %s\n", filename);
@@ -1050,70 +1023,7 @@ void sortSalaries(Employee* employees)
 int main()
 {
 	SetConsoleCP(1251);
-	SetConsoleOutputCP(1251);	
-
-	//char sss[MAX_PATH]{ "\"C:/Users/60032/Desktop/ITI-BSUIR/ОАПЯВУ/lab7_Структуры_и_файлы_Перегруженные_функции/lab7_task2_var4/lab7_task2_var4/тест1/тест2////\"" };
-	//std::string sss{ "\"C:/Users/60032/Desktop/ITI-BSUIR/ОАПЯВУ/lab7_Структуры_и_файлы_Перегруженные_функции/lab7_task2_var4/lab7_task2_var4/тест1/тест2////\"" };
-	char sss[MAX_PATH]{ "\"g//\"" };
-
-	char rr[MAX_PATH]{};
-	strcpy_s(rr, "afsfd");
-	char* ch{};
-	//std::smatch sm;
-	std::cmatch cm;
-	//if (std::regex_search(sss, sm, std::regex("[^\"]*[^\"|/]"))) std::cout << "found\n" << sm[0].length() << ' ' << sss.size() << std::endl;
-	//std::cout << std::filesystem::current_path().string()[1] << std::endl;
-	
-	if (std::regex_search(sss, cm, std::regex("[^\"]*[^\"|/]"))) std::cout << "found\n" << cm[0].str() << ' ' << std::endl;
-	std::cout << cm.str()[1] << std::endl;
-	//std::cout << ch << std::endl;
-	//if (std::regex_search(sss, cm, std::regex("[_[:alnum:]].*?((?=/)|(?=\"))"))) std::cout << "found\n";
-	//std::regex_search(sss, cm, std::regex("[a-zA-Z]:"));
-	
-	//std::cout << pathForFile.relative_path();
-	if (std::filesystem::exists("kl\\kll\\klll"))
-	{
-		std::cout << "exists";
-	}
-	else
-	{
-		std::cout << "NOTexists";
-	}
-	try
-	{
-		if (std::filesystem::exists("f:"))
-		{
-			std::cout << "exists";
-		}
-		else
-		{
-			std::cout << "NOTexists";
-		}
-
-		//std::filesystem::path pathForFile("a/b");
-		//std::cout << pathForFile;
-		/*if (create_directories(pathForFile))
-		{
-			std::cout << "\ntrue" << std::endl;
-		}
-		else
-		{
-			std::cout << "\nfalse" << std::endl;
-		}*/
-	}
-	catch (std::filesystem::filesystem_error const& ex)
-	{
-		std::cout << std::filesystem::current_path();
-		std::cout << "what():  " << ex.what() << '\n'
-			<< "path1(): " << ex.path1() << '\n'
-			<< "path2(): " << ex.path2() << '\n'
-			<< "code().value():    " << ex.code().value() << '\n'
-			<< "code().message():  " << ex.code().message() << '\n'
-			<< "code().category(): " << ex.code().category().name() << '\n';
-	}
-
-	/*system("pause");
-	return 0;*/
+	SetConsoleOutputCP(1251);
 
 	Employee* employees{ nullptr };
 	Employee* tempEmployees{ nullptr };
@@ -1129,7 +1039,7 @@ int main()
 		return 1;
 	}
 
-	fillEmloyeesArray(employees, 7);
+	fillEmloyeesArray(employees, 5);
 
 	while (true)
 	{
