@@ -573,7 +573,6 @@ void editData(Employee& employee)
 		}
 		baseEmployee = employee;
 	}
-
 }
 
 void editData(Employee* employees)
@@ -1019,6 +1018,7 @@ void sortSalaries(Employee* employees)
 	delete[] salaries;
 	system("pause");
 }
+// --------------------------------------------------------------
 
 int main()
 {
