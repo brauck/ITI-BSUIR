@@ -5,6 +5,8 @@ docs/_build/
 *.swp
 rebuild.cmd
 
+*.docx
+
 # Business Intelligence projects
 *.rdl.data
 *.bim.layout
