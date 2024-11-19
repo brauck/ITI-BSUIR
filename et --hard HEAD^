@@ -1,0 +1,407 @@
+[33mcommit d55317af5ff7f333ef657f81714ee03500ae5418[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Nov 20 00:53:21 2024 +0300
+
+    Sp_Pr2 create modern template
+
+[33mcommit c6dd02e07726bb9d7b309d1d6501421506a285e3[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Mon Oct 7 01:17:22 2024 +0300
+
+    add txt to gitignore
+
+[33mcommit 73ebec0fdf0db6fea37d8be35ead19eed5ae4ce0[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Oct 6 16:23:21 2024 +0300
+
+    add docx to gitignore
+
+[33mcommit f0fb1d803f40be1909c7c87352a8567f0dbdf045[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: brauck <109923715+brauck@users.noreply.github.com>
+Date:   Mon May 20 19:30:11 2024 +0300
+
+    Add files via upload
+
+[33mcommit 38517a4671b70a383abe7312b14eda792606d190[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Mar 21 05:22:50 2024 +0300
+
+    finish lab7
+
+[33mcommit bfdfc8906449617c42455c2379c68104096212fb[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Mar 21 04:18:09 2024 +0300
+
+    finish raw lab7
+
+[33mcommit 7293a814853a5087b01676b98960c9a814f6129b[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Mar 15 03:31:26 2024 +0300
+
+    finish raw lab7.cpp
+
+[33mcommit ef0fa9dd701433774d134ce9b6d8702e1a9a8a8d[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Mar 14 23:19:28 2024 +0300
+
+    add data path lab7
+
+[33mcommit e2d646370b6662711747c303a07e03d9481815fb[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Mar 14 08:26:11 2024 +0300
+
+    add path lab7
+
+[33mcommit 8b0edfb137c6007cf293c8035ba5f7db4fe4be63[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Mar 12 01:43:39 2024 +0300
+
+    make draft lab7
+
+[33mcommit 32b67b996cbec9bd18bfaae04f3fe0fc9a5a3964[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Mon Mar 11 07:56:12 2024 +0300
+
+    make almost ready lab7 cpp
+
+[33mcommit 09cd194effb1e804af8a3a7a7640c833fab3a9da[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Mar 8 02:29:57 2024 +0300
+
+    make almost ready lab7 cpp
+
+[33mcommit 9fd5f63658b6bb2b3d21d44f16cf04ef7ce27544[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Mar 6 01:12:04 2024 +0300
+
+    update lab7 cpp draft
+
+[33mcommit fb24ae4832dfbefed62bae8e9cd385884ad66a3b[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Feb 29 05:07:07 2024 +0300
+
+    finish lab7 cpp draft
+
+[33mcommit 477c667af300a6cdcdc3c74078c053136a52948e[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Feb 29 00:40:57 2024 +0300
+
+    start main task
+
+[33mcommit 09fc7bd3499fa208257a07072bd271760f944339[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Feb 28 01:48:26 2024 +0300
+
+    make edit
+
+[33mcommit fe4732beca191e556ec8c00e3bfd4be69793de66[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Feb 27 08:03:57 2024 +0300
+
+    make draw edit
+
+[33mcommit 7e2d96ab2662b9f20e8fb217f74d6fe56194a23d[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Feb 27 03:36:42 2024 +0300
+
+    solve delete
+
+[33mcommit 7284076f0abc0c6ad20d47faab78576230ab1436[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Feb 25 01:15:42 2024 +0300
+
+    start delete
+
+[33mcommit 1faa3aacdf916b4643d4446a759197d11521d773[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Feb 24 20:30:39 2024 +0300
+
+    make add data
+
+[33mcommit 8c8345cc4e2baf9a2b75758d9e95e9a43850fd6b[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Feb 24 15:31:04 2024 +0300
+
+    make show data
+
+[33mcommit d2adba635bb7f6509bbb4a60808329e1a3198445[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Feb 23 04:34:53 2024 +0300
+
+    start lab7 task2
+
+[33mcommit 887474cf21738c2ffd0f71308fa0523bfd1e5322[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Feb 23 02:43:06 2024 +0300
+
+    finish lab7_task1
+
+[33mcommit 6f249fac4785fd444b2058594de268869cbe21c3[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Feb 21 02:28:43 2024 +0300
+
+    finish lab7_task1.cpp
+
+[33mcommit 092a25af64008dc7e42d91161b20f190bbafe9bc[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Feb 20 23:40:24 2024 +0300
+
+    finish draw lab7_task1
+
+[33mcommit 39c5556e55bc9000cb97f8f2ec77ec0aeabedbfd[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Feb 14 19:26:50 2024 +0300
+
+    finish befor save load
+
+[33mcommit 5e07708a9893f2231e7e0bb857df23250602629c[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Feb 14 06:13:17 2024 +0300
+
+    make raw info
+
+[33mcommit d7bcdb57b1883b9497cc57d722cbba5b208a6984[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Feb 14 00:59:36 2024 +0300
+
+    finish check cube
+
+[33mcommit 14517221cf0c9dc80af4ef97180cc5dda5e716ad[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Feb 13 06:40:04 2024 +0300
+
+    write isEdgesEqual
+
+[33mcommit a6dacae196580c0ca506de6254cf7778478eda6a[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Feb 13 01:52:01 2024 +0300
+
+    make setFigure
+
+[33mcommit 2174cad6c0d4fd85ba2be230cc3072cd7a0e66f3[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Mon Feb 12 20:36:04 2024 +0300
+
+    draw cube
+
+[33mcommit 3600d5f8460308ca06eb7ac49a550b7374500b5a[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Feb 11 02:39:42 2024 +0300
+
+    finish lab 6
+
+[33mcommit ebc6a2f7aeb705f13a40256472701fde1fe35199[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Feb 10 23:01:33 2024 +0300
+
+    solve lab6 bullet 4
+
+[33mcommit ef2636cf130a527ff70dea089df2ef9fdf951382[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Feb 10 20:05:14 2024 +0300
+
+    solve lab6 bullet 3
+
+[33mcommit 2b0a10e9e537cea8aec527745d9f6dbca9079d97[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Feb 10 18:37:22 2024 +0300
+
+    solve lab6 bullets 1 - 2
+
+[33mcommit 6ca6cfff22277d0d293f069fc077d52d7acf8793[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Jan 26 02:58:51 2024 +0300
+
+    finish lab5
+
+[33mcommit 5e9318bb2cdfbf6388c40e3a6aee1d6efb26defb[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Jan 25 00:09:45 2024 +0300
+
+    finish lab5_task2.cpp
+
+[33mcommit 112f63cd1967e2cccf2fc7384f025bcc19f0f186[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Jan 23 07:53:39 2024 +0300
+
+    solve lab5_task2.cpp
+
+[33mcommit 818f0d378be5dde946fe41859422aef03bf2beb5[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Jan 20 23:38:53 2024 +0300
+
+    solve lab5 task2 without digits
+
+[33mcommit ce84b7298ab5251d4ef0a45df13fd88453a2cc4c[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Jan 20 21:07:23 2024 +0300
+
+    write base for lab5 task2
+
+[33mcommit 5b052e852f350e9ef684edc49b616688920d5da6[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Jan 19 00:55:24 2024 +0300
+
+    create letters base
+
+[33mcommit 34fa09cd2d193addf7a8105719a48a5851010e6a[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Jan 11 00:08:20 2024 +0300
+
+    do code base
+
+[33mcommit 38d969680795de45b353870748ddc0929c50ca52[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Jan 10 16:27:01 2024 +0300
+
+    do lab5 task1
+
+[33mcommit 04d19a9ef0817b0a501ef1e653aa625741d40e86[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Jan 10 15:29:17 2024 +0300
+
+    do blank lab5
+
+[33mcommit c1523a5061898295a1a490576c8579f570df637a[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Wed Jan 10 05:39:28 2024 +0300
+
+    correct
+
+[33mcommit 32c8ea7e9255e0114e12591056b17a12375b9f34[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Jan 9 20:53:18 2024 +0300
+
+    finish lab4
+
+[33mcommit dc766dc41108b1bd06fab7d7e25299bd2adb82c9[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Jan 9 20:47:23 2024 +0300
+
+    finish lab3
+
+[33mcommit 00e23238ce8aff559539a6e6706f95895d78c1e4[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Tue Jan 9 11:32:28 2024 +0300
+
+    do part lab4 task3 cpp
+
+[33mcommit 321d1a9f6158400437059c02c30df4ea8430f6d5[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Mon Jan 8 16:04:01 2024 +0300
+
+    do lab3 task3 cpp
+
+[33mcommit c09af57e7307f7e234d29457a73c7379a6ca5d7e[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Mon Jan 8 01:30:39 2024 +0300
+
+    do lab3 task2
+
+[33mcommit d3add3148105aa632058d35dbe67338774d753f1[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Jan 7 14:59:03 2024 +0300
+
+    do lab3 task1
+
+[33mcommit 55159e5c3aa173ede4db75c5143b2c84ca1fdd10[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 17:33:07 2023 +0300
+
+    finish lab2
+
+[33mcommit 8c8234962be6df9782f5bc13c26b46f05b5c1a35[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 13:00:47 2023 +0300
+
+    do task5
+
+[33mcommit 3db684aefcd2101474c26c76b41ff6ad42205ed1[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 11:19:02 2023 +0300
+
+    do task4
+
+[33mcommit 08c4d86f8858f8397b1d13ec84932b323e979537[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 09:43:27 2023 +0300
+
+    do task3
+
+[33mcommit 9fbdf4f7c77ded77d8d8e5ec21d4aaafed4f30e0[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 06:42:27 2023 +0300
+
+    update gitignore
+
+[33mcommit 6bffac515b0cd3525995fbc8dfaf9d50215964b9[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 06:38:47 2023 +0300
+
+    do 1, 2
+
+[33mcommit ad922c25c0952910060b4ac24c18fa1e6eb2e722[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 00:47:56 2023 +0300
+
+    del pdf
+
+[33mcommit 4d3156c7e59bf05693c3202ce601a95891a190c7[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sun Dec 31 00:35:45 2023 +0300
+
+    finish lab1
+
+[33mcommit 6d8c57f8beef82aa1e9a7549120dbc85a22d924f[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Dec 30 19:02:15 2023 +0300
+
+    solve lab1.cpp
+
+[33mcommit 7a434c515b2cf707ce583f8e4d5b83d129f1a8b5[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Dec 30 11:26:03 2023 +0300
+
+    make half lab1
+
+[33mcommit a18c0bf396cce13b61a22d24f8cb138bbf6a5d3f[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Sat Dec 30 04:15:37 2023 +0300
+
+    update gitignore
+
+[33mcommit 91f2ab5ac1ebcf72a35c2b7aa43f1efa678ca3e5[m
+Author: brauck <109923715+brauck@users.noreply.github.com>
+Date:   Fri Oct 27 01:06:39 2023 +0300
+
+    Create LICENSE
+
+[33mcommit d18bb2b5e11947ecd5e9a73e5548546970d6c9af[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Oct 13 07:08:00 2023 +0300
+
+    solve variant 2
+
+[33mcommit 2badfaf3a0e9a6985a0dd581bf5497d809c21a8b[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Fri Oct 13 00:14:51 2023 +0300
+
+    solve task 1-1
+
+[33mcommit d3eacc61ff81d729db95551506275b67b02d28af[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Oct 12 22:34:24 2023 +0300
+
+    create folder
+
+[33mcommit d9be9a36634c880b5882db2abcf01ff535c9a8a8[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Oct 12 22:25:54 2023 +0300
+
+    Add project files.
+
+[33mcommit c112f2185b8dcd832afe0f375901056162c73813[m
+Author: brauck <brauckhoff@yandex.com>
+Date:   Thu Oct 12 22:25:52 2023 +0300
+
+    Add .gitattributes.

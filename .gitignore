@@ -73,3 +73,5 @@ string.txt
 Сотрудники.bin
 **/x64/
 *.vcxproj*
+**/Debug
+**/Release
