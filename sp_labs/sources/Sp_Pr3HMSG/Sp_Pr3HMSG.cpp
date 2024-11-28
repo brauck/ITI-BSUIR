@@ -1,9 +1,15 @@
-#include <windows.h>
-#include <strsafe.h>
-//-- Prototypes -------------------
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+#include "Sp_Pr3HMSG.h"
+
+// Global variables
+// Дескрипторы дочерних окон
+HWND hButtonSave;
+HWND hButtonAdd;
+HWND hButtonExit;
+HWND hEdit;
+HWND hListBox;
 
 HINSTANCE g_hInst = nullptr;
+
 int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -13,7 +19,7 @@ int WINAPI wWinMain(
 {
 	WNDCLASSEX wc;
 	MSG msg;
-	g_hInst = hInstance;
+	// g_hInst = hInstance;
 
 	memset(&wc, 0, sizeof(WNDCLASSEX));
 	wc.cbSize = sizeof(WNDCLASSEX);
@@ -21,10 +27,10 @@ int WINAPI wWinMain(
 	wc.lpfnWndProc = WindowProc;
 	wc.style = CS_VREDRAW | CS_HREDRAW;
 	wc.hInstance = hInstance;
-	wc.hIcon = LoadIconW(wc.hInstance, IDI_APPLICATION); // значок окна с использованием системных значков
-	wc.hCursor = LoadCursorW(NULL, IDC_ARROW); // форма курсора с использованием системных курсоров
+	wc.hIcon = LoadIconW(wc.hInstance, MAKEINTRESOURCEW(IDI_ICON1)); // значок окна с использованием системных значков
+	wc.hCursor = LoadCursorW(NULL, /*MAKEINTRESOURCEW*/(IDC_ARROW)); // форма курсора с использованием системных курсоров
 	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1); // цвет фона окна с использованием системных кистей
-	wc.lpszMenuName = NULL;
+	wc.lpszMenuName = NULL; // MAKEINTRESOURCEW(IDR_MENU1);
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
 
@@ -34,11 +40,36 @@ int WINAPI wWinMain(
 			L"Ошибка", MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
+
+	HMENU hmenu = LoadMenuW(wc.hInstance, MAKEINTRESOURCEW(IDR_MENU1));
+
 	HWND hwnd = CreateWindowExW(NULL, L"SimpleClassName",
 		L"Simple Application with Message handling",
 		WS_OVERLAPPEDWINDOW,
 		500, // положение окна (по горизонтали)
 		150, // положение окна (по вертикали)
+		600, // размеры окна (ширина)
+		500, // размеры окна (высота)
+		NULL,
+		hmenu,
+		wc.hInstance,
+		NULL
+	);
+	if (!hwnd)
+	{
+		MessageBoxW(NULL, L"Окно не создано!",
+			L"Ошибка", MB_OK | MB_ICONERROR);
+		return FALSE;
+	}
+	ShowWindow(hwnd, nCmdShow);
+	UpdateWindow(hwnd);
+
+	// BEGIN второе окно
+	/*HWND hwnd2 = CreateWindowExW(NULL, L"SimpleClassName",
+		L"2-е окно Simple Application with Message handling",
+		WS_OVERLAPPEDWINDOW,
+		600, // положение окна (по горизонтали)
+		200, // положение окна (по вертикали)
 		600, // размеры окна (ширина)
 		500, // размеры окна (высота)
 		NULL,
@@ -52,8 +83,10 @@ int WINAPI wWinMain(
 			L"Ошибка", MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
-	ShowWindow(hwnd, nCmdShow);
-	UpdateWindow(hwnd);
+	ShowWindow(hwnd2, nCmdShow);
+	UpdateWindow(hwnd2);*/
+	// END второе окно
+
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
 		TranslateMessage(&msg);
@@ -68,19 +101,20 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 	/*int wmId, wmEvent;
 	HDC hdc;*/
 
-	static HWND hButtonSave;
-	static HWND hButtonAdd;
-	static HWND hButtonExit;
-	static HWND hEdit;
-	static HWND hListBox;
-	#define IDC_BTN_SAVE	150
-	#define IDC_BTN_ADD		151
-	#define IDC_EDIT1		152
-	#define IDC_LISTBOX		153		
+//	static HWND hButtonSave;
+//	static HWND hButtonAdd;
+//	static HWND hButtonExit;
+//	static HWND hEdit;
+//	static HWND hListBox;
+//	#define IDC_BTN_SAVE	150
+//	#define IDC_BTN_ADD		151
+//	#define IDC_EDIT1		152
+//	#define IDC_LISTBOX		153		
 		
 	switch (uMsg)
 	{
-	case WM_CREATE:
+		HANDLE_MSG(hwnd, WM_CREATE, WindowProc_OnCreate);
+	/*case WM_CREATE:
 	{
 		if (!(hEdit = CreateWindowExW(0L, L"Edit", L"Редактор",
 			WS_CHILD | WS_BORDER | WS_VISIBLE,
@@ -106,9 +140,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 			WS_CHILD | WS_BORDER | WS_VISIBLE,
 			220, 240, 80, 24, hwnd, (HMENU)(IDCANCEL),
 			g_hInst, NULL))) return (-1);
-	} return 0;
+	} return 0;*/
 
-	case WM_COMMAND:
+	HANDLE_MSG(hwnd, WM_COMMAND, WindowProc_OnCommand);
+
+	/*case WM_COMMAND:
 	{
 		const UINT32 textBufferSize = 500;
 		int wmId = LOWORD(wParam);
@@ -116,6 +152,28 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 		static wchar_t pszTextBuff[textBufferSize] = {};
 		switch (wmId)
 		{
+			// MENU BEGIN
+		case IDM_FILE_OPEN:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда открыть файл", L"Открыть файл", MB_OK);
+		} return 0;
+
+		case IDM_EDIT_SEL:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда Выделить", L"Выделить текст", MB_OK);
+		} return 0;
+
+		case IDM_EDIT_COPY:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда Копировать", L"Копировать", MB_OK);
+		} return 0;
+
+		case IDM_HELP_ABOUT:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда О программе из меню Справка", L"О программе", MB_OK);
+		} return 0;
+			// MENU END
+
 		case IDCANCEL:
 			DestroyWindow(hwnd);
 			return 0;
@@ -166,8 +224,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 		default: //обработка по умолчанию для WM_COMMAND
 			return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 		} // end switch(wmId)
-	} return 0; // end WM_COMMAND
+	} return 0; // end WM_COMMAND*/
 	
+	HANDLE_MSG(hwnd, WM_LBUTTONDOWN, WindowProc_OnLButtonDown);
+
+	/*
 	case WM_LBUTTONDOWN:
 	{
 		const wchar_t mesText[] = L"Нажата левая кнопка мыши";
@@ -178,19 +239,22 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 		TextOutW(hdc, x, y, mesText, lstrlenW(mesText)); // Вывод в контекст
 		ReleaseDC(hwnd, hdc);
 	} return 0;
+	*/
 
 	//=========================================
-	case WM_PAINT: // Вывод при обновлении окна
+	HANDLE_MSG(hwnd, WM_PAINT, WindowProc_OnPaint);
+	/*case WM_PAINT: // Вывод при обновлении окна
 	{
 		PAINTSTRUCT ps;
 		HDC hDC = BeginPaint(hwnd, &ps); // Получение контекста для обновления окна 
 		TextOutW(hDC, 10, 10, L"Hello, World!", 13); // Вывод в контекст
 		EndPaint(hwnd, &ps); // Завершение обновления окна
-	} return 0;
+	} return 0;*/
 
-	case WM_DESTROY: // Завершение работы приложения
+	HANDLE_MSG(hwnd, WM_DESTROY, WindowProc_OnDestroy);
+	/*case WM_DESTROY: // Завершение работы приложения
 		PostQuitMessage(0); // Посылка WM_QUIT приложению
-		return 0;
+		return 0;*/
 
 	}
 	return DefWindowProcW(hwnd, uMsg, wParam, lParam);
