@@ -1,7 +1,9 @@
 // Sp_Pr5.cpp : Defines the entry point for the application.
 //
+#include <windows.h>
 #include <strsafe.h>
 #include "framework.h"
+// #include <commdlg.h>
 #include "Sp_Pr5.h"
 
 #define MAX_LOADSTRING 100
@@ -11,6 +13,7 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 const UINT32 textBufferSize = 500;
+const UINT32 fileBufferSize = 1000;
 WCHAR retMessage[textBufferSize];
 
 // Forward declarations of functions included in this code module:
@@ -20,6 +23,7 @@ LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    DlgAbout1(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    DlgCtls(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    DlgTextView(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -149,6 +153,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 retVal1 = DialogBoxW(hInst, MAKEINTRESOURCEW(IDD_DIALOG2), hWnd, DlgCtls);
                 if (retVal1 == IDOK) MessageBoxW(hWnd, retMessage, L"Диалог2", MB_OK);
                 break;
+            case IDM_TEXT_VIEW:
+            {
+                DialogBoxW(hInst, MAKEINTRESOURCEW(IDD_DIALOG3), hWnd, DlgTextView);
+            } break;
             case IDM_EXIT:
                 DestroyWindow(hWnd);
                 break;
@@ -325,6 +333,131 @@ INT_PTR CALLBACK DlgCtls(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
             return (INT_PTR)TRUE;
         }*/
         //break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+// Message handler for "Просмотр текстового файла" box.
+INT_PTR CALLBACK DlgTextView(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    static wchar_t pszFileTextBuff[fileBufferSize] = {};
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        /*SYSTEMTIME st; GetLocalTime(&st);
+        const UINT32 textBufferSize = 200;
+        WCHAR txt[textBufferSize] = {};
+        if (StringCchPrintfW(txt, textBufferSize - 1, L"%d ч %d мин %d сек\n",
+            st.wHour, st.wMinute, st.wSecond) == S_OK)
+        {
+            SetDlgItemTextW(hDlg, IDC_TIME, txt);
+        }
+        else
+        {
+            MessageBoxW(hDlg, L"Превышена максимальная длина текста", L"Содержимое буфера", MB_OK | MB_ICONERROR);
+        }*/
+    } return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        int wmEvent = HIWORD(wParam);
+        
+        switch (wmId)
+        {
+        case IDCANCEL:
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+        } return (INT_PTR)TRUE;
+        
+        case IDOK:
+        { // здесь сохраняем данные
+            // GetDlgItemTextW(hDlg, IDC_EDIT1, retMessage, textBufferSize);
+            EndDialog(hDlg, LOWORD(wParam));
+        } return (INT_PTR)TRUE;
+
+        // =========== Загрузка текста в поле Edit ==============
+        case IDC_BTN_LOAD:
+        {
+            wchar_t pszFileName[300] = {};
+            StringCchCopyW(pszFileName, 299, L"D:\\lb5testUTF16LE.txt"); // L"D:\\lb5testUTF8.txt" lb5testUTF16LE
+            //StringCchCopyW(pszFileTextBuff, fileBufferSize, pszFileName);
+           
+            //=======OPENFILENAME===================================
+            OPENFILENAME ofn;   // структура для common dialog box
+
+            //TCHAR lpszFileSpec[260];   // массив для имени файла
+
+            //HWND hwnd;          // дескриптор окна–влвдельца
+
+            //HANDLE hFile;       // дескриптор файла
+
+//#define MAX_BYTES  10000
+
+            //ТCHAR Buffer[MAX_BYTES] // буфер для текста
+
+
+
+                //Иницализация OPENFILENAME
+
+                ZeroMemory(&ofn, sizeof(OPENFILENAME));
+
+            ofn.lStructSize = sizeof(OPENFILENAME);
+
+            ofn.hwndOwner = hDlg;  // hwnd – дескриптор окна–влвдельца
+
+            ofn.lpstrFile = pszFileName;
+
+            ofn.lpstrFile[0] = '\0';
+
+            ofn.nMaxFile = sizeof(pszFileName);
+
+            // Формирование массива строк шаблонов фильтра
+
+            ofn.lpstrFilter = L"All\0*.*\0Text\0*.TXT\0";
+
+            ofn.nFilterIndex = 1; // Индекс для текущего шаблона фильтра
+
+            ofn.lpstrFileTitle = NULL; // Без заголовка
+
+            ofn.nMaxFileTitle = 0;
+
+            ofn.lpstrInitialDir = NULL; // В качестве начального текущий каталог
+
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+
+
+            // Отображение диалогового окна
+
+            BOOL fRet = GetOpenFileName(&ofn);
+
+            if (fRet == FALSE) return -1;//ошибка в далоге
+
+            
+            //==========================================
+            HANDLE hFile;
+            hFile = CreateFileW(pszFileName, GENERIC_READ, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+            //hFile = CreateFileW(pszFileName, GENERIC_READ | GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (hFile == INVALID_HANDLE_VALUE)
+                return (-1);
+            DWORD cbReaded;
+            BOOL f = ReadFile(hFile, pszFileTextBuff, fileBufferSize, &cbReaded, nullptr);
+            SetDlgItemTextW(hDlg, IDC_EDIT_FILE, pszFileTextBuff);
+        } return (INT_PTR)TRUE; //IDC_BTN_SAVE
+
+       
+        }
+    } return (INT_PTR)TRUE;
+    /*
+    if ((LOWORD(wParam) == IDOK) || (LOWORD(wParam) == IDCANCEL))
+    {
+        EndDialog(hDlg, LOWORD(wParam));
+        return (INT_PTR)TRUE;
+    }*/
+    //break;
     }
     return (INT_PTR)FALSE;
 }
