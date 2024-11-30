@@ -21,7 +21,7 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{c5ffa4e7-cbe4-4457-9e92-3a80b5163490}</ProjectGuid>
+    <ProjectGuid>{4f0a83a7-64d9-470b-b2f9-283181e1249e}</ProjectGuid>
     <RootNamespace>SpPr1Simple</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -127,7 +127,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Sp_Pr1_Simple.cpp" />
+    <ClCompile Include="SP_Pr1_Simple.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
