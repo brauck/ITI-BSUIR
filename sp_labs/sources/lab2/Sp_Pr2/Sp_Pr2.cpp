@@ -1,9 +1,14 @@
 #include <windows.h>
-#include <strsafe.h>
 //-- Prototypes -------------------
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+//-- Global Variables ------------
+const WCHAR g_lpszClassName[] = L"sp_pr2_class";
+const WCHAR g_lpszAplicationTitle[] = L"Главное окно приложения. Програмист Калевич Сергей";
+const WCHAR g_lpszDestroyMessage[] =
+L"Поступило сообщение WM_DESTROY, из обработчика которого и выполнен данный вывод. "
+"Сообщение поступило в связи с разрушением окна приложения";
 HINSTANCE g_hInst = nullptr;
+
 int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -11,19 +16,18 @@ int WINAPI wWinMain(
 	_In_ int       nCmdShow
 )
 {
-	WNDCLASSEX wc;
+	WNDCLASSEX wc = {};
 	MSG msg;
-	g_hInst = hInstance;
-
+	g_hInst = hInstance;	
 	memset(&wc, 0, sizeof(WNDCLASSEX));
 	wc.cbSize = sizeof(WNDCLASSEX);
-	wc.lpszClassName = L"SimpleClassName";
+	wc.lpszClassName = g_lpszClassName;
 	wc.lpfnWndProc = WindowProc;
 	wc.style = CS_VREDRAW | CS_HREDRAW;
 	wc.hInstance = hInstance;
 	wc.hIcon = LoadIconW(wc.hInstance, IDI_APPLICATION); // значок окна с использованием системных значков
 	wc.hCursor = LoadCursorW(NULL, IDC_ARROW); // форма курсора с использованием системных курсоров
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1); // цвет фона окна с использованием системных кистей
+	wc.hbrBackground = CreateSolidBrush(RGB(0, 0, 127)); // цвет фона окна с использованием системных кистей
 	wc.lpszMenuName = NULL;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -34,13 +38,13 @@ int WINAPI wWinMain(
 			L"Ошибка", MB_OK | MB_ICONERROR);
 		return FALSE;
 	}
-	HWND hwnd = CreateWindowExW(NULL, L"SimpleClassName",
-		L"Simple Application with Message handling",
+	HWND hwnd = CreateWindowExW(NULL, g_lpszClassName,
+		g_lpszAplicationTitle,
 		WS_OVERLAPPEDWINDOW,
 		500, // положение окна (по горизонтали)
 		150, // положение окна (по вертикали)
-		600, // размеры окна (ширина)
-		500, // размеры окна (высота)
+		800, // размеры окна (ширина)
+		300, // размеры окна (высота)
 		NULL,
 		NULL,
 		hInstance,
@@ -64,132 +68,67 @@ int WINAPI wWinMain(
 // Оконная процедура
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 	WPARAM wParam, LPARAM lParam)
-{
-	/*int wmId, wmEvent;
-	HDC hdc;*/
-
-	static HWND hButtonSave;
-	static HWND hButtonAdd;
-	static HWND hButtonExit;
-	static HWND hEdit;
-	static HWND hListBox;
-	#define IDC_BTN_SAVE	150
-	#define IDC_BTN_ADD		151
-	#define IDC_EDIT1		152
-	#define IDC_LISTBOX		153		
-		
+{			
 	switch (uMsg)
 	{
 	case WM_CREATE:
 	{
-		if (!(hEdit = CreateWindowExW(0L, L"Edit", L"Редактор",
-			WS_CHILD | WS_BORDER | WS_VISIBLE,
-			20, 50, 160, 40, hwnd, (HMENU)(IDC_EDIT1),
-			g_hInst, NULL))) return (-1);
-
-		if (!(hListBox = CreateWindowExW(0L, L"ListBox",
-			L"Список", WS_CHILD | WS_BORDER | WS_VISIBLE,
-			200, 50, 160, 180, hwnd, (HMENU)(IDC_LISTBOX),
-			g_hInst, NULL))) return (-1);
-
-		if (!(hButtonSave = CreateWindowExW(0L, L"Button", L"В буфер",
-			WS_CHILD | WS_BORDER | WS_VISIBLE,
-			20, 240, 80, 24, hwnd, (HMENU)(IDC_BTN_SAVE),
-			g_hInst, NULL))) return (-1);
-
-		if (!(hButtonAdd = CreateWindowExW(0L, L"Button", L"В список",
-			WS_CHILD | WS_BORDER | WS_VISIBLE,
-			120, 240, 80, 24, hwnd, (HMENU)(IDC_BTN_ADD),
-			g_hInst, NULL))) return (-1);
-
+		MessageBoxW(NULL, L"Выполняется обработка WM_CREATE", L"Создание окна", MB_OK);
+		if (!hwnd) return -1;		
+		HWND hButtonExit;
 		if (!(hButtonExit = CreateWindowExW(0L, L"Button", L"Выход",
 			WS_CHILD | WS_BORDER | WS_VISIBLE,
-			220, 240, 80, 24, hwnd, (HMENU)(IDCANCEL),
+			680, 130, 80, 24, hwnd, (HMENU)(IDCANCEL),
 			g_hInst, NULL))) return (-1);
 	} return 0;
 
 	case WM_COMMAND:
 	{
-		const UINT32 textBufferSize = 500;
 		int wmId = LOWORD(wParam);
 		int wmEvent = HIWORD(wParam);
-		static wchar_t pszTextBuff[textBufferSize] = {};
 		switch (wmId)
 		{
 		case IDCANCEL:
+		{
 			DestroyWindow(hwnd);
 			return 0;
-		case IDC_BTN_SAVE:
-		{
-			int cch;
-			cch = SendMessageW(hEdit, WM_GETTEXT, (WPARAM)textBufferSize, (LPARAM)pszTextBuff);
-			if (cch == 0)
-			{
-				MessageBoxW(hwnd, L"Введите текст", L"Читаем Edit", MB_OK);
-				return 0;
-			}
-			else if (WM_GETTEXT > textBufferSize)
-			{
-				MessageBoxW(hwnd, L"Превышена максимальная длина текста", L"Читаем Edit", MB_OK | MB_ICONERROR);
-				return 0;
-			}
-			else
-			{
-				wchar_t msgBuff[textBufferSize] = {};
-				SYSTEMTIME st; GetSystemTime(&st);
-				if (StringCchPrintfW(msgBuff, textBufferSize - 1, L"Время : %d ч %d мин %d сек\n",
-					st.wHour, st.wMinute, st.wSecond) == S_OK)
-				{
-					if (StringCchCatW(msgBuff, textBufferSize - 1, L"Текст в памяти: ") == S_OK
-						&& StringCchCatW(msgBuff, textBufferSize - 1, pszTextBuff) == S_OK)
-					{
-						MessageBoxW(hwnd, msgBuff, L"Содержимое буфера", MB_OK);
-					}
-					else
-					{
-						MessageBoxW(hwnd, L"Ошибка при конкатенации", L"Содержимое буфера", MB_OK | MB_ICONERROR);
-					}					
-				}
-				else {
-					MessageBoxW(hwnd, L"Превышена максимальная длина текста", L"Содержимое буфера", MB_OK | MB_ICONERROR);
-				}
-			}
-		} return 0; //IDC_BTN_SAVE
-		case IDC_BTN_ADD:
-		{
-			int ind;
-			ind = SendMessageW(hListBox, LB_ADDSTRING,
-				(WPARAM)0, (LPARAM)pszTextBuff);
-			if (ind == LB_ERR)
-				MessageBoxW(hwnd, L"Ошибка в списке", L"", MB_OK);
-		} return 0; // end IDC_BTN_ADD
-		default: //обработка по умолчанию для WM_COMMAND
-			return DefWindowProcW(hwnd, uMsg, wParam, lParam);
-		} // end switch(wmId)
+		}
+		return DefWindowProcW(hwnd, uMsg, wParam, lParam);
+		} 
 	} return 0; // end WM_COMMAND
 	
 	case WM_LBUTTONDOWN:
 	{
-		const wchar_t mesText[] = L"Нажата левая кнопка мыши";
+		const WCHAR mesText[] = L"Обработка сообщения WM_LBUTTONDOWN, "
+			"которое посылается в окно при щелчке левой кнопки мыши";
 		int x = LOWORD(lParam);
 		int y = HIWORD(lParam);
 
 		HDC hdc = GetDC(hwnd);
-		TextOutW(hdc, x, y, mesText, lstrlenW(mesText)); // Вывод в контекст
+		TextOutW(hdc, 50, 200, mesText, lstrlenW(mesText));
+		RECT rect = {};
+		rect.left = (long)LOWORD(lParam);
+		rect.bottom = CW_USEDEFAULT;
+		rect.right = CW_USEDEFAULT;
+		rect.top = (long)HIWORD(lParam);
+		DrawText(hdc, mesText, lstrlen(mesText), &rect, DT_LEFT);
 		ReleaseDC(hwnd, hdc);
 	} return 0;
 
-	//=========================================
 	case WM_PAINT: // Вывод при обновлении окна
 	{
+		const WCHAR mesText[] = L"Обработка сообщения WM_PAINT. "
+			"Это соообщение окно получает после того, "
+			"как оно было закрыто другим окном и затем открыто.";
 		PAINTSTRUCT ps;
-		HDC hDC = BeginPaint(hwnd, &ps); // Получение контекста для обновления окна 
-		TextOutW(hDC, 10, 10, L"Hello, World!", 13); // Вывод в контекст
+		HDC hDC = BeginPaint(hwnd, &ps); // Получение контекста для обновления окна
+		TextOutW(hDC, 20, 100, mesText, lstrlen(mesText)); // Вывод в контекст
 		EndPaint(hwnd, &ps); // Завершение обновления окна
 	} return 0;
 
 	case WM_DESTROY: // Завершение работы приложения
-		PostQuitMessage(0); // Посылка WM_QUIT приложению
+		MessageBoxW(hwnd, g_lpszDestroyMessage, L"Завершение работы", MB_OK);
+		PostQuitMessage(5); // Посылка WM_QUIT приложению
 		return 0;
 
 	}
