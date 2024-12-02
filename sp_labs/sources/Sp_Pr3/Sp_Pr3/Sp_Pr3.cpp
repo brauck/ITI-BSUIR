@@ -1,15 +1,10 @@
-#include "Sp_Pr3HMSG.h"
-
-// Global variables
-// Дескрипторы дочерних окон
-HWND hButtonSave;
-HWND hButtonAdd;
-HWND hButtonExit;
-HWND hEdit;
-HWND hListBox;
+#include <windows.h>
+#include <strsafe.h>
+#include "resource.h"
+//-- Prototypes -------------------
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 HINSTANCE g_hInst = nullptr;
-
 int WINAPI wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -87,10 +82,14 @@ int WINAPI wWinMain(
 	UpdateWindow(hwnd2);*/
 	// END второе окно
 
+	HACCEL hAccel = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDR_ACCEL1));
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (!TranslateAccelerator(hwnd, hAccel, &msg))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 	}
 	return msg.wParam;
 }
@@ -101,20 +100,19 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 	/*int wmId, wmEvent;
 	HDC hdc;*/
 
-//	static HWND hButtonSave;
-//	static HWND hButtonAdd;
-//	static HWND hButtonExit;
-//	static HWND hEdit;
-//	static HWND hListBox;
-//	#define IDC_BTN_SAVE	150
-//	#define IDC_BTN_ADD		151
-//	#define IDC_EDIT1		152
-//	#define IDC_LISTBOX		153		
+	static HWND hButtonSave;
+	static HWND hButtonAdd;
+	static HWND hButtonExit;
+	static HWND hEdit;
+	static HWND hListBox;
+	#define IDC_BTN_SAVE	150
+	#define IDC_BTN_ADD		151
+	#define IDC_EDIT1		152
+	#define IDC_LISTBOX		153		
 		
 	switch (uMsg)
 	{
-		HANDLE_MSG(hwnd, WM_CREATE, WindowProc_OnCreate);
-	/*case WM_CREATE:
+	case WM_CREATE:
 	{
 		if (!(hEdit = CreateWindowExW(0L, L"Edit", L"Редактор",
 			WS_CHILD | WS_BORDER | WS_VISIBLE,
@@ -140,11 +138,30 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 			WS_CHILD | WS_BORDER | WS_VISIBLE,
 			220, 240, 80, 24, hwnd, (HMENU)(IDCANCEL),
 			g_hInst, NULL))) return (-1);
-	} return 0;*/
 
-	HANDLE_MSG(hwnd, WM_COMMAND, WindowProc_OnCommand);
+		HMENU hmFile = GetSubMenu(GetMenu(hwnd), 0);				
+		AppendMenuW(hmFile, MF_STRING | MF_ENABLED, IDM_FILE_CLOSE, L"Закрыть документ");
+	} return 0;
 
-	/*case WM_COMMAND:
+	case WM_MENUSELECT:
+	{
+		HDC hdc1;
+		const WCHAR lpszMsgSpace[] = L"ШШШШШШШШШШШШШШШШШШШШШШШШШШ";
+		TCHAR Buf[300];
+		HINSTANCE hInst;
+		hInst = (HINSTANCE)GetWindowLongW(hwnd, GWL_HINSTANCE);
+		int size;
+		size = LoadString(hInst, LOWORD(wParam), Buf, 300);
+		hdc1 = GetDC(hwnd);
+		RECT rc;
+		GetClientRect(hwnd, &rc);
+		TextOut(hdc1, rc.left + 10, rc.bottom - 30,
+			lpszMsgSpace, lstrlen(lpszMsgSpace));
+		TextOut(hdc1, rc.left + 10, rc.bottom - 30, Buf, lstrlen(Buf));
+		ReleaseDC(hwnd, hdc1);
+	}return 0;
+
+	case WM_COMMAND:
 	{
 		const UINT32 textBufferSize = 500;
 		int wmId = LOWORD(wParam);
@@ -152,15 +169,44 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 		static wchar_t pszTextBuff[textBufferSize] = {};
 		switch (wmId)
 		{
+		case IDM_FILE_CREATE:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда создать файл", L"Создать файл", MB_OK);
+			MENUITEMINFO mInfo;
+			mInfo.cbSize = sizeof(MENUITEMINFO);
+			mInfo.fState = MFS_ENABLED;
+			mInfo.fMask = MIIM_STATE;
+			SetMenuItemInfoW(GetSubMenu(GetMenu(hwnd), 1), 0, true, &mInfo);
+		} return 0;
+
 			// MENU BEGIN
 		case IDM_FILE_OPEN:
 		{
 			MessageBoxW(hwnd, L"Выбрана команда открыть файл", L"Открыть файл", MB_OK);
 		} return 0;
 
+		case IDM_FILE_CLOSE: {
+			MessageBoxW(hwnd, L"Выбрана команда закрыть документ", L"Закрыть документ", MB_OK);
+			MENUITEMINFO mInfo;
+			mInfo.cbSize = sizeof(MENUITEMINFO);
+			mInfo.fState = MFS_GRAYED;
+			mInfo.fMask = MIIM_STATE;
+			SetMenuItemInfoW(GetSubMenu(GetMenu(hwnd), 1), 0, true, &mInfo);
+			SetMenuItemInfoW(GetSubMenu(GetMenu(hwnd), 1), 2, true, &mInfo);
+		}break;
+
 		case IDM_EDIT_SEL:
 		{
 			MessageBoxW(hwnd, L"Выбрана команда Выделить", L"Выделить текст", MB_OK);
+			MENUITEMINFO mInfo;
+			mInfo.cbSize = sizeof(MENUITEMINFO);
+			mInfo.fState = MFS_ENABLED;
+			mInfo.fMask = MIIM_STATE;
+			SetMenuItemInfoW(GetSubMenu(GetMenu(hwnd), 1), 2, true, &mInfo);
+		} return 0;
+		case IDM_EDIT_CUT:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда Вырезать", L"Вырезать текст", MB_OK);
 		} return 0;
 
 		case IDM_EDIT_COPY:
@@ -168,9 +214,18 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 			MessageBoxW(hwnd, L"Выбрана команда Копировать", L"Копировать", MB_OK);
 		} return 0;
 
+		case IDM_EDIT_PASTE:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда Вставить", L"Вставить", MB_OK);
+		} return 0;
+
 		case IDM_HELP_ABOUT:
 		{
 			MessageBoxW(hwnd, L"Выбрана команда О программе из меню Справка", L"О программе", MB_OK);
+		} return 0;
+		case IDM_HELP_HELP:
+		{
+			MessageBoxW(hwnd, L"Выбрана команда Помощь из меню Справка", L"Помощь", MB_OK);
 		} return 0;
 			// MENU END
 
@@ -224,12 +279,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 		default: //обработка по умолчанию для WM_COMMAND
 			return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 		} // end switch(wmId)
-	} return 0; // end WM_COMMAND*/
+	} return 0; // end WM_COMMAND
 	
-	HANDLE_MSG(hwnd, WM_LBUTTONDOWN, WindowProc_OnLButtonDown);
-
-	/*
-	case WM_LBUTTONDOWN:
+	/*case WM_LBUTTONDOWN:
 	{
 		const wchar_t mesText[] = L"Нажата левая кнопка мыши";
 		int x = LOWORD(lParam);
@@ -238,24 +290,38 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 		HDC hdc = GetDC(hwnd);
 		TextOutW(hdc, x, y, mesText, lstrlenW(mesText)); // Вывод в контекст
 		ReleaseDC(hwnd, hdc);
-	} return 0;
-	*/
+	} return 0;*/
 
-	//=========================================
-	HANDLE_MSG(hwnd, WM_PAINT, WindowProc_OnPaint);
-	/*case WM_PAINT: // Вывод при обновлении окна
+	case WM_RBUTTONUP: {
+
+		POINT pt;
+		pt.x = LOWORD(lParam);
+		pt.y = HIWORD(lParam);
+		HMENU hMenu = CreatePopupMenu();
+
+		ClientToScreen(hwnd, &pt);
+
+		UINT CopyState = GetMenuState(GetSubMenu(GetMenu(hwnd), 1), 2, MF_BYPOSITION);
+		UINT SelState = GetMenuState(GetSubMenu(GetMenu(hwnd), 1), 0, MF_BYPOSITION);
+
+		AppendMenuW(hMenu, SelState, IDM_EDIT_SEL, L"Выделить");
+		AppendMenuW(hMenu, CopyState, IDM_EDIT_COPY, L"Копировать");
+
+		TrackPopupMenu(hMenu, TPM_RIGHTBUTTON, pt.x, pt.y, 0, hwnd, NULL);
+		DestroyMenu(hMenu);
+	}return 0;
+
+	case WM_PAINT: // Вывод при обновлении окна
 	{
 		PAINTSTRUCT ps;
 		HDC hDC = BeginPaint(hwnd, &ps); // Получение контекста для обновления окна 
 		TextOutW(hDC, 10, 10, L"Hello, World!", 13); // Вывод в контекст
 		EndPaint(hwnd, &ps); // Завершение обновления окна
-	} return 0;*/
+	} return 0;
 
-	HANDLE_MSG(hwnd, WM_DESTROY, WindowProc_OnDestroy);
-	/*case WM_DESTROY: // Завершение работы приложения
+	case WM_DESTROY: // Завершение работы приложения
 		PostQuitMessage(0); // Посылка WM_QUIT приложению
-		return 0;*/
-
+		return 0;
 	}
 	return DefWindowProcW(hwnd, uMsg, wParam, lParam);
 }

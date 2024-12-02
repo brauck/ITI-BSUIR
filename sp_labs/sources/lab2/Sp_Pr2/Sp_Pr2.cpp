@@ -3,7 +3,7 @@
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 //-- Global Variables ------------
 const WCHAR g_lpszClassName[] = L"sp_pr2_class";
-const WCHAR g_lpszAplicationTitle[] = L"Главное окно приложения. Програмист Калевич Сергей";
+const WCHAR g_lpszAplicationTitle[] = L"Главное окно приложения. Программист Калевич Сергей";
 const WCHAR g_lpszDestroyMessage[] =
 L"Поступило сообщение WM_DESTROY, из обработчика которого и выполнен данный вывод. "
 "Сообщение поступило в связи с разрушением окна приложения";

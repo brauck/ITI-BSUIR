@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{f224ecaf-fbd7-4a4f-be48-788bd02ff26c}</ProjectGuid>
-    <RootNamespace>SpPr3HMSG</RootNamespace>
+    <ProjectGuid>{22ec50f2-437d-46a8-a4e1-4c17cbc8fe7d}</ProjectGuid>
+    <RootNamespace>SpPr3</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,22 +127,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sp_Pr3.cpp" />
+  </ItemGroup>
+  <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Sp_Pr3HMSG.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Commands.cpp" />
-    <ClCompile Include="Messages.cpp" />
-    <ClCompile Include="Sp_Pr3HMSG.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="Sp_Pr3HMSG.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="cursor1.cur" />
+    <ResourceCompile Include="Sp_Pr3.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cursor1.cur" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
