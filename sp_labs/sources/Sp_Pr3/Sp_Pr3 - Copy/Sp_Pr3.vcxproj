@@ -127,13 +127,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Commands.cpp" />
-    <ClCompile Include="Messages.cpp" />
     <ClCompile Include="Sp_Pr3.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
-    <ClInclude Include="Sp_Pr3.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Sp_Pr3.rc" />
