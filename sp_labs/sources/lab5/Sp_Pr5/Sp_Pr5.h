@@ -14,13 +14,14 @@
 
 #define MAX_LOADSTRING 100
 
+const UINT32 textBufferSize = 500;
+const UINT32 fileBufferSize = 10000;
+
 extern HINSTANCE hInst;                                // current instance
 extern WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 extern WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-const UINT32 textBufferSize = 500;
-const UINT32 fileBufferSize = 1000;
 extern WCHAR retMessage[textBufferSize];
-extern wchar_t pszFileTextBuff[fileBufferSize];
+extern WCHAR pszFileTextBuff[fileBufferSize];
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
