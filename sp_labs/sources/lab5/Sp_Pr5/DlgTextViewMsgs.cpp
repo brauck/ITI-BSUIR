@@ -19,7 +19,7 @@ void DlgTextView_OnCommand(HWND hDlg, int id, HWND hwndCtl, UINT codeNotify)
 
     case IDOK:
     { // здесь сохраняем данные
-        // GetDlgItemTextW(hDlg, IDC_EDIT1, retMessage, textBufferSize);
+        //GetDlgItemTextW(hDlg, IDC_EDIT1, retMessage, textBufferSize);
         EndDialog(hDlg, id);
     } return;
 

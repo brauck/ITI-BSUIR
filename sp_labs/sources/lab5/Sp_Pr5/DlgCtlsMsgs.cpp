@@ -19,7 +19,8 @@ void DlgCtls_OnCommand(HWND hDlg, int id, HWND hwndCtl, UINT codeNotify)
 
     case IDOK:
     { // здесь сохраняем данные
-        GetDlgItemTextW(hDlg, IDC_EDIT1, retMessage, textBufferSize);
+        //GetDlgItemTextW(hDlg, IDC_EDIT1, retMessage, textBufferSize);
+        MessageBoxW(hDlg, pszTextBuff, L"Диалог2", MB_OK);
         EndDialog(hDlg, id);
     } return;
 

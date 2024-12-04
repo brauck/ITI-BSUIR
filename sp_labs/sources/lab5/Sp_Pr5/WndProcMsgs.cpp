@@ -20,8 +20,8 @@ void WndProc_OnCommand(HWND hWnd, int wmId, HWND hwndCtl, UINT wmEvent)
             break;
         case IDM_HELP_DLGCTLS:
             MessageBoxW(hWnd, L"¬ыбрана команда Ёлементы управлени€", L"Ёлементы управлени€", MB_OK);
-            INT_PTR retVal1;
-            retVal1 = DialogBoxW(hInst, MAKEINTRESOURCEW(IDD_DIALOG2), hWnd, DlgCtls);
+            //INT_PTR retVal1;
+            DialogBoxW(hInst, MAKEINTRESOURCEW(IDD_DIALOG2), hWnd, DlgCtls);
             //if (retVal1 == IDOK) MessageBoxW(hWnd, retMessage, L"ƒиалог2", MB_OK);
             break;
         case IDM_TEXT_VIEW:

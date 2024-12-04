@@ -56,10 +56,10 @@
     <ClCompile Include="DlgAbout1Msgs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DlgCtlsMsgs.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="DlgTextViewMsgs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DlgCtlsMsgs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
