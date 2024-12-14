@@ -139,7 +139,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
           //  hFont = MyFontCreate2(hWnd, hDcText);
             hFont = MyFontCreate();
             hOldFont = (HFONT)SelectObject(hDcText, hFont);
-            LPCTSTR message = TEXT("Шрифт 2, сформированный здесь");
+            LPCTSTR message = TEXT("Калевич Сергей Михайлович");
+            SetTextColor(hDcText, RGB(128, 0, 0));
             TextOut(hDcText, 50, 50, message, lstrlen(message));
             ReleaseDC(hWnd, hDcText);
 
@@ -147,8 +148,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //==========================================
             case IDM_FILE_DRAW:
             {
-                MyDraw(hWnd);
-                DraweImage(hWnd);
+                //MyDraw(hWnd);
+                //DraweImage(hWnd);
+                static HMETAFILE hmf = GetMetaFile(MetaDraw());
+                HDC hdc = GetDC(hWnd);
+                PlayMetaFile(hdc, hmf);
             }break;
             //==========================================
             case IDM_ABOUT:

@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="Drawing.cpp" />
     <ClCompile Include="Image.cpp" />
+    <ClCompile Include="MetaDrawing.cpp" />
     <ClCompile Include="MyFontCreate.cpp" />
     <ClCompile Include="MyFontCreate2.cpp" />
     <ClCompile Include="SpPr7.cpp" />

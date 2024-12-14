@@ -12,3 +12,4 @@ HFONT APIENTRY MyFontCreate(void);
 HFONT APIENTRY MyFontCreate2(HWND, HDC);
 void MyDraw(HWND);
 void DraweImage(HWND);
+LPCTSTR MetaDraw();
