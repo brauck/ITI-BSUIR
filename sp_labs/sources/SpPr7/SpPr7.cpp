@@ -149,7 +149,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             case IDM_FILE_DRAW:
             {
                 //MyDraw(hWnd);
-                //DraweImage(hWnd);
+                DraweImage(hWnd);
                 static HMETAFILE hmf = GetMetaFile(MetaDraw());
                 HDC hdc = GetDC(hWnd);
                 PlayMetaFile(hdc, hmf);

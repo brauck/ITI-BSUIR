@@ -2,7 +2,6 @@
 
 
 void DraweImage(HWND hWndForImage) {
-	//case IDM_VIEW_GRAPHIC:
 	HDC hDC;
 	HDC hCompDC;
 	HANDLE hBmp;
@@ -22,4 +21,3 @@ void DraweImage(HWND hWndForImage) {
 	DeleteObject(hBmp);
 	ReleaseDC(hWndForImage, hDC);
 }
-//	break;
