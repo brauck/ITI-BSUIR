@@ -11,6 +11,42 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
+// Глобальные переменные:
+HINSTANCE hInst;                                                // текущий экземпляр
+WCHAR szTitle[MAX_LOADSTRING];                                  // Текст строки заголовка
+WCHAR szWindowClass[MAX_LOADSTRING];                            // имя класса главного окна
+
+// Для запуска процессов
+HANDLE ProcHandle[4] = { nullptr,nullptr,nullptr,nullptr };     // для дескрипторов процессов;
+DWORD ProcId[4] = { 0,0,0,0 };// для идентификаторов процессов;
+HANDLE ThreadHandle[4] = { nullptr,nullptr,nullptr,nullptr };   // для дескрипторов потоков;
+DWORD ThreadId[4] = { 0,0,0,0 }; // для.идентификаторов потоков;
+
+LPCTSTR ProcImage[4] = { nullptr,
+                        TEXT("C:\\Windows\\notepad.exe"),
+                        nullptr,
+                        TEXT("C:\\Windows\\System32\\calc.exe") }; //для указателей строк,
+//идентифицирущих файлы запускаемых программ;
+
+TCHAR CmdParam[4][260] = { 0,0,0,0 };// для строк c параметрами запускаемых программ.
+//////////////////////
+// глобальные объекты для потоков
+//=====================================
+HANDLE hThread[3] = { nullptr,nullptr,nullptr };
+DWORD dwThreadId[3] = { 0,0,0 };
+DWORD g_uXPos = 20;
+DWORD g_uYPos = 50;
+THREAD_PARAM ThrParam1 = { 1, g_uXPos, g_uYPos, nullptr };
+THREAD_PARAM ThrParam2 = { 2, g_uXPos, g_uYPos + 40, nullptr };
+BOOL fSin = FALSE;
+
+// Для синхронизации
+HANDLE g_hMutex = nullptr;
+BOOL fSyn = FALSE;
+HANDLE g_hSemaphore = nullptr;
+HANDLE g_hEvent = nullptr;
+
+
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
@@ -131,6 +167,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             // Parse the menu selections:
             switch (wmId)
             {
+            //== Обработка команд меню ====================================
+            //== ПРОЦЕССЫ =================================================
+            case IDM_PROC_NOTEPAD:
+            {
+                SECURITY_ATTRIBUTES sap, sat;//стр. атр. безоп. проц. и потока
+                sap.nLength = sizeof(SECURITY_ATTRIBUTES);
+                sap.lpSecurityDescriptor = nullptr;
+                sap.bInheritHandle = FALSE;
+
+                sat.nLength = sizeof(SECURITY_ATTRIBUTES);
+                sat.lpSecurityDescriptor = nullptr;
+                sat.bInheritHandle = FALSE;
+
+                STARTUPINFO si;
+                ZeroMemory(&si, sizeof(STARTUPINFO));
+                si.cb = sizeof(STARTUPINFO);
+
+                PROCESS_INFORMATION pi;
+
+                //TCHAR cmdLine1[] = { 0 };
+                //lstrcpy(CmdParam[2], cmdLine1);
+                BOOL f = CreateProcess(ProcImage[1], nullptr,
+                    &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
+
+                ProcHandle[1] = pi.hProcess;
+                ThreadHandle[1] = pi.hThread;
+                ProcId[1] = pi.dwProcessId;
+                ThreadId[1] = pi.dwThreadId;
+
+                CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);
+
+            }break;
+            //============================================================
+            //============================================================
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
                 break;
