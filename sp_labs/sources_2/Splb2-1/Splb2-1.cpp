@@ -6,11 +6,6 @@
 
 #define MAX_LOADSTRING 100
 
-// Global Variables:
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-
 // Глобальные переменные:
 HINSTANCE hInst;                                                // текущий экземпляр
 WCHAR szTitle[MAX_LOADSTRING];                                  // Текст строки заголовка
@@ -36,8 +31,8 @@ HANDLE hThread[3] = { nullptr,nullptr,nullptr };
 DWORD dwThreadId[3] = { 0,0,0 };
 DWORD g_uXPos = 20;
 DWORD g_uYPos = 50;
-THREAD_PARAM ThrParam1 = { 1, g_uXPos, g_uYPos, nullptr };
-THREAD_PARAM ThrParam2 = { 2, g_uXPos, g_uYPos + 40, nullptr };
+//THREAD_PARAM ThrParam1 = { 1, g_uXPos, g_uYPos, nullptr };
+//THREAD_PARAM ThrParam2 = { 2, g_uXPos, g_uYPos + 40, nullptr };
 BOOL fSin = FALSE;
 
 // Для синхронизации
@@ -52,6 +47,7 @@ ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    DlgInfoProc(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -66,6 +62,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
     LoadStringW(hInstance, IDC_SPLB21, szWindowClass, MAX_LOADSTRING);
+
+    ProcHandle[0] = GetCurrentProcess();
+    ThreadHandle[0] = GetCurrentThread();
+    ProcId[0] = GetCurrentProcessId();
+    ThreadId[0] = GetCurrentThreadId();
+    TCHAR lpFileName[260];
+    GetModuleFileName(nullptr, lpFileName, sizeof(lpFileName));
+    ProcImage[0] = lpFileName;
+
     MyRegisterClass(hInstance);
 
     // Perform application initialization:
@@ -133,8 +138,11 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable
 
+   //HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+   //   CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-      CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, nullptr, nullptr, hInstance, nullptr);
+       500, 100, 600, 400, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -186,9 +194,17 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
                 PROCESS_INFORMATION pi;
 
+                /*BOOL f = CreateProcess(TEXT("C:\\Windows\\notepad.exe"),
+                    nullptr,
+                    &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);*/
+
                 //TCHAR cmdLine1[] = { 0 };
-                //lstrcpy(CmdParam[2], cmdLine1);
+               /* lstrcpy(CmdParam[2], cmdLine1);
                 BOOL f = CreateProcess(ProcImage[1], nullptr,
+                    &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);*/
+                TCHAR cmdLine1[260];
+                lstrcpy(cmdLine1, ProcImage[1]);
+                BOOL f = CreateProcess(nullptr, cmdLine1, //(LPTSTR) ProcImage[1],
                     &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
 
                 ProcHandle[1] = pi.hProcess;
@@ -196,11 +212,79 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 ProcId[1] = pi.dwProcessId;
                 ThreadId[1] = pi.dwThreadId;
 
-                CloseHandle(pi.hProcess);
-                CloseHandle(pi.hThread);
+                
 
             }break;
-            //============================================================
+
+            //== Блокное с текстом =======================================
+            case IDM_PROC_TEXT:
+            {
+                SECURITY_ATTRIBUTES sap, sat;//стр. атр. безоп. проц. и потока
+                sap.nLength = sizeof(SECURITY_ATTRIBUTES);
+                sap.lpSecurityDescriptor = nullptr;
+                sap.bInheritHandle = FALSE;
+
+                sat.nLength = sizeof(SECURITY_ATTRIBUTES);
+                sat.lpSecurityDescriptor = nullptr;
+                sat.bInheritHandle = FALSE;
+
+                STARTUPINFO si;
+                ZeroMemory(&si, sizeof(STARTUPINFO));
+                si.cb = sizeof(STARTUPINFO);
+
+                PROCESS_INFORMATION pi;
+                   
+                lstrcpy(CmdParam[2], TEXT(" D:\\IIT_labs\\ITI-BSUIR\\sp_labs\\sources_2\\Splb2-1\\Resource.h"));
+                    BOOL f = CreateProcess(ProcImage[1], CmdParam[2],
+                        &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
+                
+                ProcHandle[2] = pi.hProcess;
+                ThreadHandle[2] = pi.hThread;
+                ProcId[2] = pi.dwProcessId;
+                ThreadId[2] = pi.dwThreadId;
+
+                /*CloseHandle(pi.hProcess);
+                CloseHandle(pi.hThread);*/
+
+            }break;
+
+            case IDM_PROC_CLOSENOTEPAD:
+            {
+                if (!TerminateProcess(ProcHandle[1], 5))
+                {
+                    DWORD err = GetLastError();
+                    TCHAR mess[200];
+                    wsprintf(mess, TEXT("Ошибка вызова ТР %d 0x%X"), err, err);
+                    MessageBox(hWnd, mess, nullptr, MB_OK);
+                }
+
+                if (!TerminateProcess(ProcHandle[2], 12))
+                {
+                    DWORD err = GetLastError();
+                    TCHAR mess[200];
+                    wsprintf(mess, TEXT("Ошибка вызова ТР %d 0x%X"), err, err);
+                    MessageBox(hWnd, mess, nullptr, MB_OK);
+                }
+                //TerminateProcess(ProcHandle[2], 12);
+            }break;
+            //=== информация о процессах =================================
+            case IDM_INFO_CUR:
+            {
+                DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, DlgInfoProc, 0);
+            }break;
+            case IDM_INFO_NOTEPAD:
+            {
+                DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, DlgInfoProc, 1);
+            }break;
+            case IDM_INFO_TEXT:
+            {
+                DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, DlgInfoProc, 2);
+            }break;
+            case IDM_INFO_CALC:
+            {
+                DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_DIALOG1), hWnd, DlgInfoProc, 3);
+            }break;
+            
             //============================================================
             case IDM_ABOUT:
                 DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
@@ -238,6 +322,56 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
     {
     case WM_INITDIALOG:
         return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK DlgInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        SetDlgItemText(hDlg, IDC_EDIT1, ProcImage[lParam]);
+        TCHAR txtBuff[200];
+
+        wsprintf(txtBuff, TEXT("0x%08X"), ProcHandle[lParam]);
+        SetDlgItemText(hDlg, IDC_EDIT2, txtBuff);
+
+        wsprintf(txtBuff, TEXT("0x%08X"), ThreadHandle[lParam]);
+        SetDlgItemText(hDlg, IDC_EDIT3, txtBuff);
+
+        wsprintf(txtBuff, TEXT("%d"), ProcId[lParam]);
+        SetDlgItemText(hDlg, IDC_EDIT4, txtBuff);
+
+        wsprintf(txtBuff, TEXT("%d"), ThreadId[lParam]);
+        SetDlgItemText(hDlg, IDC_EDIT5, txtBuff);
+
+        DWORD exitCode;
+        if (!GetExitCodeProcess(ProcHandle[lParam], &exitCode))
+        {
+            DWORD err = GetLastError();
+            wsprintf(txtBuff, TEXT("Ошибка 0x%08X"), err);
+        }else
+            if(exitCode==STILL_ACTIVE)
+            { 
+                wsprintf(txtBuff, TEXT("Процесс не завершился"));
+            }
+            else
+            {
+                wsprintf(txtBuff, TEXT("код завершения %d"), exitCode);
+            }
+        SetDlgItemText(hDlg, IDC_EDIT6, txtBuff);
+    } return (INT_PTR)TRUE;
 
     case WM_COMMAND:
         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
