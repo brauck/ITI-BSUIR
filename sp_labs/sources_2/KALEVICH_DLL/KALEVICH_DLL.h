@@ -17,6 +17,7 @@ public:
 	// TODO: add your methods here.
 };
 
+extern KALEVICHDLL_API int g_nDllCallsCount;
 extern KALEVICHDLL_API int nKALEVICHDLL;
 
 KALEVICHDLL_API int fnKALEVICHDLL(void);
