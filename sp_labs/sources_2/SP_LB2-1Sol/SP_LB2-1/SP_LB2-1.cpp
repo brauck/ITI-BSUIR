@@ -25,6 +25,11 @@ LPCTSTR ProcImage[4] = { nullptr,
 
 TCHAR CmdParam[4][260] = { 0,0,0,0 }; // для строк c параметрами запускаемых программ.
 //////////////////////
+
+// глобальные переменные для времени процесса
+FILETIME ftKernelTimeStart[5], ftUserTimeStart[5], ftDummy[5], ftCreate[5];//для хранения времени при создании
+
+//=====================================
 // глобальные объекты для потоков
 //=====================================
 HANDLE hThread[3] = { nullptr,nullptr,nullptr };
@@ -426,14 +431,46 @@ INT_PTR CALLBACK DlgInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
         else
             if (exitCode == STILL_ACTIVE)
             {
-                wsprintf(txtBuff, TEXT("Процесс не завершился"));
+                wsprintf(txtBuff, TEXT("Состояние - Активен"));
             }
             else
             {
                 wsprintf(txtBuff, TEXT("код завершения %d"), exitCode);
             }
         SetDlgItemText(hDlg, IDC_EDIT6, txtBuff);
-    } return (INT_PTR)TRUE;
+
+        DWORD thread;
+        GetExitCodeThread(ThreadHandle[lParam], &thread);
+        if (thread == STILL_ACTIVE)
+        {
+            SetDlgItemText(hDlg, IDC_EDIT7, TEXT("Состояние - Активен"));
+        }
+        else
+        {
+            SetDlgItemInt(hDlg, IDC_EDIT7, thread, true);
+        }
+
+        DWORD PriorityClass = GetPriorityClass(ProcHandle[lParam]);
+        TCHAR decimalString[100];
+        _itow_s(PriorityClass, decimalString, 16);//перевод из hex
+        SetDlgItemText(hDlg, IDC_EDIT8, decimalString);
+
+        FILETIME KernelTime, UserTime, CreateTime, EndTime;//переменные для определения конечного времени работы процесса
+        UINT qwKernelTimeElapsed, qwUserTimeElapsed, qwTotalTimeElapsed, qwNotWorkTime;//переменные для хранения времени работы процесса
+        GetProcessTimes(ProcHandle[lParam], &CreateTime, &EndTime, &KernelTime, &UserTime);
+
+        qwTotalTimeElapsed = (&EndTime - &CreateTime);
+        SetDlgItemInt(hDlg, IDC_EDIT9, qwTotalTimeElapsed, false);
+
+        qwUserTimeElapsed = (&UserTime - &ftUserTimeStart[lParam]);
+        SetDlgItemInt(hDlg, IDC_EDIT10, qwUserTimeElapsed, false);
+
+        qwKernelTimeElapsed = (&KernelTime - &ftKernelTimeStart[lParam]);
+        SetDlgItemInt(hDlg, IDC_EDIT11, qwKernelTimeElapsed, false);
+
+        qwNotWorkTime = qwTotalTimeElapsed - (qwUserTimeElapsed + qwKernelTimeElapsed);
+        SetDlgItemInt(hDlg, IDC_EDIT12, qwNotWorkTime, false);
+    } return (INT_PTR)TRUE;    
 
     case WM_COMMAND:
         if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)

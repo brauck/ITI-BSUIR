@@ -19,6 +19,12 @@
 #define IDC_EDIT4                       1003
 #define IDC_EDIT5                       1004
 #define IDC_EDIT6                       1005
+#define IDC_EDIT7                       1006
+#define IDC_EDIT8                       1007
+#define IDC_EDIT9                       1008
+#define IDC_EDIT10                       1009
+#define IDC_EDIT11                       10010
+#define IDC_EDIT12                       10011
 #define IDM_PROC_NOTEPAD                32771
 #define IDM_PROC_TEXT                   32772
 #define IDM_PROC_CALC                   32773
@@ -55,7 +61,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        130
 #define _APS_NEXT_COMMAND_VALUE         32798
-#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
