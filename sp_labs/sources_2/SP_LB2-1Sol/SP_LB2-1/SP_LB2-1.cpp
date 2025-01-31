@@ -272,8 +272,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //BOOL f = CreateProcess(ProcImage[1], CmdParam[2],
             //    &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
 
-            BOOL f = CreateProcess(ProcImage[2], CmdParam[2], NULL,
-                NULL, false, 0, NULL, NULL, &si, &pi);
+            BOOL f = CreateProcess(ProcImage[2], CmdParam[2],
+                    &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
 
             ProcHandle[2] = pi.hProcess;
             ThreadHandle[2] = pi.hThread;

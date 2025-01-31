@@ -79,7 +79,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg,
 	{
 	case WM_CREATE:
 	{
-		if (!(hEdit = CreateWindowExW(0L, L"Edit", L"",
+		if (!(hEdit = CreateWindowExW(0L, L"Edit", L"asfasfd\r\nasdfasf",
 			WS_CHILD | WS_BORDER | ES_MULTILINE | WS_VISIBLE,
 			20, 50, 320, 100, hwnd, (HMENU)(IDC_EDIT1),
 			g_hInst, NULL))) return (-1);
