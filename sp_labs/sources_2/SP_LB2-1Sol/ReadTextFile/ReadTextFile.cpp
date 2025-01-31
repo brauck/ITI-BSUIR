@@ -13,7 +13,7 @@ HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 
-TCHAR* buffer;                                  // Буфер для информации из файла
+TCHAR* buffer;                                  // file content
 DWORD bytesRead;
 
 // Forward declarations of functions included in this code module:
@@ -164,15 +164,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         ofn.lpstrInitialDir = NULL;
         ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-        /*if (GetOpenFileName(&ofn)) {
-
-            LPCWSTR cmd = TEXT("Notepad ");
-            lstrcat(CmdParam[2], cmd);
-            lstrcat(CmdParam[2], ofn.lpstrFile);
-
-        }*/
-
-        //GetOpenFileName(&ofn);
         if (GetOpenFileName(&ofn)) {
 
             LPCTSTR cmd = TEXT("Notepad ");
@@ -186,10 +177,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         si.cb = sizeof(STARTUPINFO);
 
         PROCESS_INFORMATION pi;
-
-        //lstrcpy(CmdParam[2], TEXT(" D:\\IIT_labs\\ITI-BSUIR\\sp_labs\\sources_2\\SP_LB2-1Sol\\SP_LB2-1\\Resource.h"));
-        //BOOL f = CreateProcess(ProcImage[1], CmdParam[2],
-        //    &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
 
         if (CreateProcess(TEXT("C:\\Windows\\notepad.exe"), CmdParam,
             &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi))
@@ -233,10 +220,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             } break;
             }
         }
-        /*if (!(hEdit = CreateWindowExW(0L, L"Edit", L"",
-            WS_CHILD | WS_BORDER | ES_MULTILINE | WS_VISIBLE | WS_VSCROLL,
-            20, 50, 600, 400, hWnd, (HMENU)(IDC_EDIT1),
-            hInst, NULL))) return (-1);*/
     } break;
     case WM_COMMAND:
         {
