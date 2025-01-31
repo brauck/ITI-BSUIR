@@ -13,6 +13,8 @@
 #define IDC_SPLB21                      109
 #define IDR_MAINFRAME                   128
 #define IDD_DIALOG1                     129
+#define IDD_DIALOG2                     130
+#define IDD_TESTPROC                    130
 #define IDC_EDIT1                       1000
 #define IDC_EDIT2                       1001
 #define IDC_EDIT3                       1002
@@ -22,9 +24,16 @@
 #define IDC_EDIT7                       1006
 #define IDC_EDIT8                       1007
 #define IDC_EDIT9                       1008
-#define IDC_EDIT10                       1009
-#define IDC_EDIT11                       10010
-#define IDC_EDIT12                       10011
+#define IDC_EDIT10                      1009
+#define IDC_EDIT11                      10010
+#define IDC_EDIT12                      10011
+#define IDC_SIZE_X                      10012
+#define IDC_SIZE_Y                      10013
+#define IDC_X                      10014
+#define IDC_Y                      10015
+#define ID_RBMAX                      10016
+#define ID_RBNORMAL                      10017
+#define ID_RBMIN                      10018
 #define IDM_PROC_NOTEPAD                32771
 #define IDM_PROC_TEXT                   32772
 #define IDM_PROC_CALC                   32773
@@ -52,6 +61,7 @@
 #define IDM_THINFO_THR1                 32795
 #define IDM_SYN_ON                      32796
 #define IDM_SYN_OFF                     32797
+#define IDM_PROC_TEST                   32798
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -59,8 +69,8 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NO_MFC                     1
-#define _APS_NEXT_RESOURCE_VALUE        130
-#define _APS_NEXT_COMMAND_VALUE         32798
+#define _APS_NEXT_RESOURCE_VALUE        131
+#define _APS_NEXT_COMMAND_VALUE         32799
 #define _APS_NEXT_CONTROL_VALUE         1012
 #define _APS_NEXT_SYMED_VALUE           110
 #endif

@@ -10,6 +10,8 @@
 HINSTANCE hInst;                                                // текущий экземпляр
 WCHAR szTitle[MAX_LOADSTRING];                                  // Текст строки заголовка
 WCHAR szWindowClass[MAX_LOADSTRING];                            // имя класса главного окна
+TCHAR lpszFileSpec[MAX_PATH];                                   // для открытия файла
+WORD showWnd = SW_NORMAL;
 
 // Для запуска процессов
 HANDLE ProcHandle[4] = { nullptr,nullptr,nullptr,nullptr };     // для дескрипторов процессов;
@@ -19,7 +21,7 @@ DWORD ThreadId[4] = { 0,0,0,0 }; // для.идентификаторов потоков;
 
 LPCTSTR ProcImage[4] = { nullptr,
                         TEXT("C:\\Windows\\notepad.exe"),
-                        nullptr,
+                        TEXT("C:\\Windows\\notepad.exe"),
                         TEXT("C:\\Windows\\System32\\calc.exe") }; //для указателей строк,
                                                                    //идентифицирущих файлы запускаемых программ;
 
@@ -53,6 +55,7 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    DlgInfoProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    dialogTestProcess(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -233,15 +236,44 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             sat.lpSecurityDescriptor = nullptr;
             sat.bInheritHandle = FALSE;
 
+            OPENFILENAME ofn;
+            ZeroMemory(&ofn, sizeof(OPENFILENAME));
+
+            HANDLE hFile;
+
+            ofn.lStructSize = sizeof(OPENFILENAME);
+            ofn.hwndOwner = hWnd;
+            ofn.lpstrFile = lpszFileSpec;
+            ofn.lpstrFile[0] = '\0';
+            ofn.nMaxFile = sizeof(lpszFileSpec);
+            ofn.lpstrFilter = TEXT("All\0*.*\0Text\0*.txt\0");
+            ofn.nFilterIndex = 1;
+            ofn.lpstrFileTitle = NULL;
+            ofn.nMaxFileTitle = 0;
+            ofn.lpstrInitialDir = NULL;
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+            if (GetOpenFileName(&ofn)) {
+
+                LPCWSTR cmd = TEXT("Notepad ");
+                lstrcpy(CmdParam[2], (LPTSTR)TEXT(""));
+                lstrcat(CmdParam[2], cmd);
+                lstrcat(CmdParam[2], ofn.lpstrFile);
+
+            }
+
             STARTUPINFO si;
             ZeroMemory(&si, sizeof(STARTUPINFO));
             si.cb = sizeof(STARTUPINFO);
 
             PROCESS_INFORMATION pi;
 
-            lstrcpy(CmdParam[2], TEXT(" D:\\IIT_labs\\ITI-BSUIR\\sp_labs\\sources_2\\SP_LB2-1Sol\\SP_LB2-1\\Resource.h"));
-            BOOL f = CreateProcess(ProcImage[1], CmdParam[2],
-                &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
+            //lstrcpy(CmdParam[2], TEXT(" D:\\IIT_labs\\ITI-BSUIR\\sp_labs\\sources_2\\SP_LB2-1Sol\\SP_LB2-1\\Resource.h"));
+            //BOOL f = CreateProcess(ProcImage[1], CmdParam[2],
+            //    &sap, &sat, FALSE, 0, nullptr, nullptr, &si, &pi);
+
+            BOOL f = CreateProcess(ProcImage[2], CmdParam[2], NULL,
+                NULL, false, 0, NULL, NULL, &si, &pi);
 
             ProcHandle[2] = pi.hProcess;
             ThreadHandle[2] = pi.hThread;
@@ -332,6 +364,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             }
             //TerminateProcess(ProcHandle[2], 12);
         }break;
+
+        case IDM_PROC_TEST:
+        {
+
+            DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_TESTPROC), hWnd, dialogTestProcess, 0);
+
+        } break;
 
         //=== информация о процессах =================================
         case IDM_INFO_CUR:
@@ -477,6 +516,94 @@ INT_PTR CALLBACK DlgInfoProc(HWND hDlg, UINT message, WPARAM wParam, LPARAM lPar
         {
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+
+INT_PTR CALLBACK dialogTestProcess(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam) {
+    switch (message)
+    {
+    case WM_INITDIALOG: {
+        SetDlgItemInt(hDlg, IDC_SIZE_X, 250, false);
+        SetDlgItemInt(hDlg, IDC_SIZE_Y, 250, false);
+        SetDlgItemInt(hDlg, IDC_X, 400, false);
+        SetDlgItemInt(hDlg, IDC_Y, 400, false);
+        CheckRadioButton(hDlg, ID_RBMAX, ID_RBNORMAL, ID_RBNORMAL);
+
+        return (INT_PTR)TRUE;
+    }
+    case WM_COMMAND:
+        switch (LOWORD(wParam))
+        {
+        case IDOK: {
+            // Путь к приложению TestProc
+            TCHAR lpszFileName[MAX_PATH] = _T("");
+
+            // Настройка структуры OPENFILENAME
+            OPENFILENAME ofn;;
+            ZeroMemory(&ofn, sizeof(OPENFILENAME));
+            ofn.lStructSize = sizeof(OPENFILENAME);
+            //ofn.hwndOwner = hWnd;
+            ofn.lpstrFile = lpszFileName;
+            ofn.lpstrTitle = _T("Запустить программу");
+            ofn.nMaxFile = sizeof(lpszFileName);
+            ofn.lpstrFilter = _T("Text Files (*.exe)\0*.exe\0All Files (*.*)\0*.*\0");
+            ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+            // Отображение диалогового окна
+            if (!GetOpenFileName(&ofn)) return -1;
+
+            // Настройка структуры SECURITY_ATTRIBUTES 
+            SECURITY_ATTRIBUTES sa;
+            sa.nLength = sizeof(SECURITY_ATTRIBUTES);
+            sa.lpSecurityDescriptor = NULL;
+            sa.bInheritHandle = FALSE;
+
+
+            PROCESS_INFORMATION pi;
+            ZeroMemory(&pi, sizeof(PROCESS_INFORMATION));
+
+            STARTUPINFO si;
+
+            ZeroMemory(&si, sizeof(si));
+            si.cb = sizeof(si);
+            si.dwFlags = STARTF_USEPOSITION | STARTF_USESIZE | STARTF_USESHOWWINDOW;
+            si.wShowWindow = SW_NORMAL;
+            si.dwXSize = GetDlgItemInt(hDlg, IDC_SIZE_X, NULL, false);
+            si.dwYSize = GetDlgItemInt(hDlg, IDC_SIZE_Y, NULL, false);
+            si.dwX = GetDlgItemInt(hDlg, IDC_X, NULL, false);
+            si.dwY = GetDlgItemInt(hDlg, IDC_Y, NULL, false);
+
+
+            //CreateProcess(L"D:\\С++\\SP_Lab_6Sol\\Debug\\TestProc.exe", NULL, NULL,
+            //    NULL, false, 0, NULL, NULL, &si, &pi);
+
+            /*CreateProcess(TEXT("TestProc.exe"), NULL, NULL,
+                NULL, false, 0, NULL, NULL, &si, &pi);*/
+            BOOL f = CreateProcess(lpszFileName, nullptr, &sa, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi);
+
+
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+            break;
+        }
+        case ID_RBMAX:
+        {
+            showWnd = SW_MAXIMIZE;
+            break;
+        }
+        case ID_RBMIN:
+        {
+            showWnd = SW_MINIMIZE;
+            break;
+        }
+        case ID_RBNORMAL:
+        {
+            showWnd = SW_NORMAL;
+            break;
+        }
         }
         break;
     }
