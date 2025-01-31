@@ -239,7 +239,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             OPENFILENAME ofn;
             ZeroMemory(&ofn, sizeof(OPENFILENAME));
 
-            HANDLE hFile;
+            //HANDLE hFile;
 
             ofn.lStructSize = sizeof(OPENFILENAME);
             ofn.hwndOwner = hWnd;
@@ -545,7 +545,7 @@ INT_PTR CALLBACK dialogTestProcess(HWND hDlg, UINT message, WPARAM wParam, LPARA
             OPENFILENAME ofn;;
             ZeroMemory(&ofn, sizeof(OPENFILENAME));
             ofn.lStructSize = sizeof(OPENFILENAME);
-            //ofn.hwndOwner = hWnd;
+            ofn.hwndOwner = 0;
             ofn.lpstrFile = lpszFileName;
             ofn.lpstrTitle = _T("Запустить программу");
             ofn.nMaxFile = sizeof(lpszFileName);
@@ -567,10 +567,16 @@ INT_PTR CALLBACK dialogTestProcess(HWND hDlg, UINT message, WPARAM wParam, LPARA
 
             STARTUPINFO si;
 
+            //HWND hNormal = ID_RBNORMAL;
+            /*if (Button_GetState(ID_RBNORMAL) == BST_CHECKED) {
+            }*/
+
             ZeroMemory(&si, sizeof(si));
             si.cb = sizeof(si);
             si.dwFlags = STARTF_USEPOSITION | STARTF_USESIZE | STARTF_USESHOWWINDOW;
-            si.wShowWindow = SW_NORMAL;
+            if (IsDlgButtonChecked(hDlg, ID_RBMAX) == BST_CHECKED) si.wShowWindow = SW_SHOWMAXIMIZED;
+            if (IsDlgButtonChecked(hDlg , ID_RBNORMAL) == BST_CHECKED) si.wShowWindow = SW_SHOWNORMAL;
+            if (IsDlgButtonChecked(hDlg, ID_RBMIN) == BST_CHECKED) si.wShowWindow = SW_SHOWMINIMIZED;
             si.dwXSize = GetDlgItemInt(hDlg, IDC_SIZE_X, NULL, false);
             si.dwYSize = GetDlgItemInt(hDlg, IDC_SIZE_Y, NULL, false);
             si.dwX = GetDlgItemInt(hDlg, IDC_X, NULL, false);
@@ -585,6 +591,12 @@ INT_PTR CALLBACK dialogTestProcess(HWND hDlg, UINT message, WPARAM wParam, LPARA
             BOOL f = CreateProcess(lpszFileName, nullptr, &sa, nullptr, FALSE, 0, nullptr, nullptr, &si, &pi);
 
 
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+            break;
+        }
+        case IDCANCEL:
+        {
             EndDialog(hDlg, LOWORD(wParam));
             return (INT_PTR)TRUE;
             break;
