@@ -18,13 +18,16 @@ struct THREAD_PARAM
 HINSTANCE hInst;                                // current instance
 WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
-DWORD dwThreadId[3] = { 0,0,0 };
-HANDLE hThr[3] = { nullptr,nullptr, nullptr };
+DWORD dwThreadId[3] = { 0,0,0 };                // идентификаторы потоков
+HANDLE hThr[3] = { nullptr,nullptr, nullptr };  // дескрипторЫ потоков
+DWORD g_uThCount = 0;                           // Количество созданных вторичных потоков
 DWORD g_uXPos = 10;
 DWORD g_uYPos = 40;
 THREAD_PARAM ThrParam1 = { 1, g_uXPos, g_uYPos, nullptr };
 THREAD_PARAM ThrParam2 = { 2, g_uXPos, g_uYPos + 24, nullptr };
-HANDLE hMutex;
+// HANDLE hMutex;
+
+
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -36,6 +39,10 @@ void for_delay(int param) {
     double x, y, z; x = 2.0; y = 3.0;
     for (int i = 0; i < param; i++) { z = x * y - 1; z = z + 1; }
 }
+void increasePriority(HMENU, DWORD);
+void decreasePriority(HMENU, DWORD);
+void setMenuItemsOnCreateThread(HMENU, DWORD);
+void setMenuItemsOnTerminateThread(HMENU, DWORD);
 
 DWORD WINAPI ThreadFunc1(PVOID pvParam);// Функция потока
 
@@ -48,7 +55,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
-    hMutex = CreateMutex(nullptr, FALSE, TEXT("Mut1"));
+    //hMutex = CreateMutex(nullptr, FALSE, TEXT("Mut1"));
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -60,6 +67,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         return FALSE;
     }
+
+    hThr[0] = GetCurrentThread();
+    dwThreadId[0] = GetCurrentThreadId();
 
     HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_KALEVICHTHREADLB));
 
@@ -146,8 +156,12 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+    HMENU hMenu = GetMenu(hWnd);
+
     switch (message)
     {
+    /*case WM_CREATE:
+    {}break;*/
     case WM_COMMAND:
     {
         int wmId = LOWORD(wParam);
@@ -156,11 +170,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         {
             //==========================================
         case IDM_TH1_CREATE:
-        {
+        {            
+            hThr[1] = nullptr;
             ThrParam1.hWnd = hWnd;
 
             hThr[1] = CreateThread(nullptr, 0,
                 ThreadFunc1, &ThrParam1, 0, &dwThreadId[1]);
+
+            setMenuItemsOnCreateThread(hMenu, 1);
+        }break;
+        case IDM_TH1_WAIT:
+        {
+            hThr[1] = nullptr;
+            ThrParam1.hWnd = hWnd;
+
+            hThr[1] = CreateThread(nullptr, 0,
+                ThreadFunc1, &ThrParam1, CREATE_SUSPENDED, &dwThreadId[1]);
+
+            setMenuItemsOnCreateThread(hMenu, 1);
 
         }break;
         case IDM_TH1_SUSP:
@@ -173,21 +200,41 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ResumeThread(hThr[1]);
 
         }break;
+        case IDM_TH1_INCREASE:
+        {
+            increasePriority(hMenu, 1);
+        }break;
+        case IDM_TH1_DECREASE:
+        {
+            decreasePriority(hMenu, 1);
+        }break;
         case IDM_TH1_TERMINATE:
         {
             TerminateThread(hThr[1], 5);
+            hThr[1] = nullptr;
+
+            setMenuItemsOnTerminateThread(hMenu, 1);
         }break;
-
-
-
 
         case IDM_TH2_CREATE:
         {
+            hThr[2] = nullptr;
             ThrParam2.hWnd = hWnd;
 
             hThr[2] = CreateThread(nullptr, 0,
                 ThreadFunc1, &ThrParam2, 0, &dwThreadId[2]);
 
+            setMenuItemsOnCreateThread(hMenu, 2);
+        }break;
+        case IDM_TH2_WAIT:
+        {
+            hThr[2] = nullptr;
+            ThrParam2.hWnd = hWnd;
+
+            hThr[2] = CreateThread(nullptr, 0,
+                ThreadFunc1, &ThrParam2, CREATE_SUSPENDED, &dwThreadId[2]);
+
+            setMenuItemsOnCreateThread(hMenu, 2);
         }break;
         case IDM_TH2_SUSP:
         {
@@ -199,9 +246,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             ResumeThread(hThr[2]);
 
         }break;
+        case IDM_TH2_INCREASE:
+        {
+            increasePriority(hMenu, 2);
+        }break;
+        case IDM_TH2_DECREASE:
+        {
+            decreasePriority(hMenu, 2);
+        }break;
         case IDM_TH2_TERMINATE:
         {
             TerminateThread(hThr[2], 5);
+            hThr[2] = nullptr;
+
+            setMenuItemsOnTerminateThread(hMenu, 2);
         }break;
         //==========================================
         case IDM_ABOUT:
@@ -270,7 +328,7 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
     int N = 3; // Размер серии из «пробегов»
 
     //Формирование текста бегущей строки
-    wsprintf(CreepStr, TEXT("#### 90322, Петров, № %d, идентификатор - 0x%08X. >>>>>"),
+    wsprintf(CreepStr, TEXT("#### 90322, Калевич, № %d, идентификатор - 0x%08X. >>>>>"),
         pThrParam->Num, dwThreadId[pThrParam->Num]);
     // Длинна строки
     SLen = begIndex = lstrlen(CreepStr);
@@ -292,7 +350,7 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
         //Взаимное исключение одновременного вывода
         //серии строк более чем одним потоком
 
-        WaitForSingleObject(hMutex, INFINITE);
+       // WaitForSingleObject(hMutex, INFINITE);
         ////////////////////////////////////////////////////
         //InvalidateRect(pThrParam->hWnd, &rc, TRUE);
         // 
@@ -326,7 +384,7 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
                     buf[i] = buf[i - 1];
                 buf[0] = c;
 
-                //Ввывод строки
+                //Вывод строки
                 TextOut(hDC, rc.left, rc.top, buf, SLen);
                 Sleep(200); //приостановка потока на 200 мсек -
                 // замедление "вращения" цикла
@@ -344,8 +402,198 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
         }//Конец цикла вывода серии строк 
 
      //конец критического участка кода – вывод серии строк
-        ReleaseMutex(hMutex);
+       // ReleaseMutex(hMutex);
 
     }
     return 0;
+}
+
+void increasePriority(HMENU hMenu, DWORD threadID)
+{
+    int thPriority = GetThreadPriority(hThr[threadID]);
+
+    switch (threadID)
+    {
+    case 1:
+    {
+        if (thPriority == THREAD_PRIORITY_LOWEST)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
+            EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_ENABLED);
+        }
+        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_HIGHEST);
+            EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_GRAYED);
+        }
+    }break;
+    case 2:
+    {
+        if (thPriority == THREAD_PRIORITY_LOWEST)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
+            EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_ENABLED);
+        }
+        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_HIGHEST);
+            EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_GRAYED);
+        }
+    }break;
+    }
+}
+       
+
+void decreasePriority(HMENU hMenu, DWORD threadID)
+{
+    int thPriority = GetThreadPriority(hThr[threadID]);
+
+    switch (threadID)
+    {
+    case 1:
+    {
+        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL) // Понижение до минимального
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_LOWEST);
+            EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_GRAYED);
+        }
+        if (thPriority == THREAD_PRIORITY_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_HIGHEST);
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
+            EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_ENABLED);
+        }
+    }break;
+    case 2:
+    {
+        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL) // Понижение до минимального
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_LOWEST);
+            EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_GRAYED);
+        }
+        if (thPriority == THREAD_PRIORITY_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
+        }
+        if (thPriority == THREAD_PRIORITY_HIGHEST);
+        {
+            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
+            EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_ENABLED);
+        }
+    }break;
+    }
+}
+
+void setMenuItemsOnCreateThread(HMENU hMenu, DWORD threadID)
+{ 
+    switch (threadID)
+    {
+    case 1:
+    {
+        EnableMenuItem(hMenu, IDM_TH1_CREATE, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH1_WAIT, MF_GRAYED);
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_HIGHEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_GRAYED);
+        }
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_LOWEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_GRAYED);
+        }
+        EnableMenuItem(hMenu, IDM_TH1_SUSP, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH1_RESUME, MF_ENABLED);
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_HIGHEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_GRAYED);
+        }
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_LOWEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_GRAYED);
+        }
+        EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH1_TERMINATE, MF_ENABLED);
+    }break;
+    case 2:
+    {
+        EnableMenuItem(hMenu, IDM_TH2_CREATE, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH2_WAIT, MF_GRAYED);
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_HIGHEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_GRAYED);
+        }
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_LOWEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_GRAYED);
+        }
+        EnableMenuItem(hMenu, IDM_TH2_SUSP, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH2_RESUME, MF_ENABLED);
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_HIGHEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_GRAYED);
+        }
+        if (GetThreadPriority(hThr[threadID]) == THREAD_PRIORITY_LOWEST)
+        {
+            EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_GRAYED);
+        }
+        EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH2_TERMINATE, MF_ENABLED);
+    }break;
+    }    
+}
+void setMenuItemsOnTerminateThread(HMENU hMenu, DWORD thread)
+{
+    switch (thread)
+    {
+    case 1:
+    {
+        EnableMenuItem(hMenu, IDM_TH1_CREATE, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH1_WAIT, MF_ENABLED);
+
+        EnableMenuItem(hMenu, IDM_TH1_SUSP, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH1_RESUME, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH1_TERMINATE, MF_GRAYED);
+    }break;
+    case 2:
+    {    
+        EnableMenuItem(hMenu, IDM_TH2_CREATE, MF_ENABLED);
+        EnableMenuItem(hMenu, IDM_TH2_WAIT, MF_ENABLED);
+
+        EnableMenuItem(hMenu, IDM_TH2_SUSP, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH2_RESUME, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_GRAYED);
+        EnableMenuItem(hMenu, IDM_TH2_TERMINATE, MF_GRAYED);
+    }break;
+    }
 }
