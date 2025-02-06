@@ -43,6 +43,8 @@ void increasePriority(HMENU, DWORD);
 void decreasePriority(HMENU, DWORD);
 void setMenuItemsOnCreateThread(HMENU, DWORD);
 void setMenuItemsOnTerminateThread(HMENU, DWORD);
+INT_PTR CALLBACK DlgInfoThread(HWND, UINT, WPARAM, LPARAM);
+SYSTEMTIME systemtime_difference(SYSTEMTIME const& st1, SYSTEMTIME const& st2);
 
 DWORD WINAPI ThreadFunc1(PVOID pvParam);// Функция потока
 
@@ -171,7 +173,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
             //==========================================
         case IDM_TH1_CREATE:
         {            
-            hThr[1] = nullptr;
             ThrParam1.hWnd = hWnd;
 
             hThr[1] = CreateThread(nullptr, 0,
@@ -181,14 +182,12 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }break;
         case IDM_TH1_WAIT:
         {
-            hThr[1] = nullptr;
             ThrParam1.hWnd = hWnd;
 
             hThr[1] = CreateThread(nullptr, 0,
                 ThreadFunc1, &ThrParam1, CREATE_SUSPENDED, &dwThreadId[1]);
 
             setMenuItemsOnCreateThread(hMenu, 1);
-
         }break;
         case IDM_TH1_SUSP:
         {
@@ -211,14 +210,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_TH1_TERMINATE:
         {
             TerminateThread(hThr[1], 5);
-            hThr[1] = nullptr;
+            //hThr[1] = nullptr;
 
             setMenuItemsOnTerminateThread(hMenu, 1);
         }break;
 
         case IDM_TH2_CREATE:
         {
-            hThr[2] = nullptr;
             ThrParam2.hWnd = hWnd;
 
             hThr[2] = CreateThread(nullptr, 0,
@@ -228,7 +226,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         }break;
         case IDM_TH2_WAIT:
         {
-            hThr[2] = nullptr;
             ThrParam2.hWnd = hWnd;
 
             hThr[2] = CreateThread(nullptr, 0,
@@ -257,10 +254,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         case IDM_TH2_TERMINATE:
         {
             TerminateThread(hThr[2], 5);
-            hThr[2] = nullptr;
+            //hThr[2] = nullptr;
 
             setMenuItemsOnTerminateThread(hMenu, 2);
         }break;
+        //===INFO===================================      
+        case IDM_INFO_TH0: {
+            DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_INFO), hWnd, DlgInfoThread, 0);
+        } break;
+        case IDM_INFO_TH1: {
+            DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_INFO), hWnd, DlgInfoThread, 1);
+        } break;
+        case IDM_INFO_TH2: {
+            DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_INFO), hWnd, DlgInfoThread, 2);
+        } break;
         //==========================================
         case IDM_ABOUT:
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
@@ -411,49 +418,54 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
 void increasePriority(HMENU hMenu, DWORD threadID)
 {
     int thPriority = GetThreadPriority(hThr[threadID]);
-
     switch (threadID)
     {
     case 1:
     {
-        if (thPriority == THREAD_PRIORITY_LOWEST)
+        switch (thPriority)
         {
-            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
-            EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_ENABLED);
-        }
-        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL)
-        {
-            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_NORMAL)
-        {
-            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
-        {
-            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_HIGHEST);
-            EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_GRAYED);
-        }
+            case THREAD_PRIORITY_LOWEST:
+            {
+                SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
+                EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_ENABLED);
+            }break;
+            case THREAD_PRIORITY_BELOW_NORMAL:
+            {
+                SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
+            }break;
+            case THREAD_PRIORITY_NORMAL:
+            {
+                SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
+            }break;
+            case THREAD_PRIORITY_ABOVE_NORMAL:
+            {
+                SetThreadPriority(hThr[threadID], THREAD_PRIORITY_HIGHEST);
+                EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_GRAYED);
+            }break;
+        }        
     }break;
     case 2:
     {
-        if (thPriority == THREAD_PRIORITY_LOWEST)
+        switch (thPriority)
+        {
+        case THREAD_PRIORITY_LOWEST:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
             EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_ENABLED);
-        }
-        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL)
+        }break;
+        case THREAD_PRIORITY_BELOW_NORMAL:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_NORMAL)
+        }break;
+        case THREAD_PRIORITY_NORMAL:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
+        }break;
+        case THREAD_PRIORITY_ABOVE_NORMAL:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_HIGHEST);
             EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_GRAYED);
+        }break;
         }
     }break;
     }
@@ -468,44 +480,50 @@ void decreasePriority(HMENU hMenu, DWORD threadID)
     {
     case 1:
     {
-        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL) // Понижение до минимального
+        switch (thPriority)
+        {
+        case THREAD_PRIORITY_BELOW_NORMAL:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_LOWEST);
             EnableMenuItem(hMenu, IDM_TH1_DECREASE, MF_GRAYED);
-        }
-        if (thPriority == THREAD_PRIORITY_NORMAL)
-        {
-            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
-        {
-            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_HIGHEST);
-        {
-            SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
-            EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_ENABLED);
+        }break;
+        case THREAD_PRIORITY_NORMAL:
+            {
+                SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
+            }break;
+        case THREAD_PRIORITY_ABOVE_NORMAL:
+            {
+                SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
+            }break;
+        case THREAD_PRIORITY_HIGHEST:
+            {
+                SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
+                EnableMenuItem(hMenu, IDM_TH1_INCREASE, MF_ENABLED);
+            }break;
         }
     }break;
     case 2:
     {
-        if (thPriority == THREAD_PRIORITY_BELOW_NORMAL) // Понижение до минимального
+        switch (thPriority)
+        {
+        case THREAD_PRIORITY_BELOW_NORMAL:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_LOWEST);
             EnableMenuItem(hMenu, IDM_TH2_DECREASE, MF_GRAYED);
-        }
-        if (thPriority == THREAD_PRIORITY_NORMAL)
+        }break;
+        case THREAD_PRIORITY_NORMAL:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_BELOW_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_ABOVE_NORMAL)
+        }break;
+        case THREAD_PRIORITY_ABOVE_NORMAL:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_NORMAL);
-        }
-        if (thPriority == THREAD_PRIORITY_HIGHEST);
+        }break;
+        case THREAD_PRIORITY_HIGHEST:
         {
             SetThreadPriority(hThr[threadID], THREAD_PRIORITY_ABOVE_NORMAL);
             EnableMenuItem(hMenu, IDM_TH2_INCREASE, MF_ENABLED);
+        }break;
         }
     }break;
     }
@@ -513,6 +531,7 @@ void decreasePriority(HMENU hMenu, DWORD threadID)
 
 void setMenuItemsOnCreateThread(HMENU hMenu, DWORD threadID)
 { 
+    g_uThCount++;
     switch (threadID)
     {
     case 1:
@@ -571,6 +590,7 @@ void setMenuItemsOnCreateThread(HMENU hMenu, DWORD threadID)
 }
 void setMenuItemsOnTerminateThread(HMENU hMenu, DWORD thread)
 {
+    g_uThCount--;
     switch (thread)
     {
     case 1:
@@ -596,4 +616,92 @@ void setMenuItemsOnTerminateThread(HMENU hMenu, DWORD thread)
         EnableMenuItem(hMenu, IDM_TH2_TERMINATE, MF_GRAYED);
     }break;
     }
+}
+
+INT_PTR CALLBACK DlgInfoThread(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    int i = (int)lParam;
+    int index = 0;
+    TCHAR buff[1000];
+    HWND listbox = GetDlgItem(hDlg, IDC_LIST1);
+
+    switch (message)
+    {
+    case WM_INITDIALOG:
+    {
+        wsprintf(buff, TEXT("Дескриптор :  %d"), hThr[i]);
+        SendMessage(listbox, LB_ADDSTRING, 0, (LPARAM)buff);
+
+        wsprintf(buff, TEXT("Индентификатор :  %d"), dwThreadId[i]);
+        SendMessage(listbox, LB_ADDSTRING, 0, (LPARAM)buff);
+
+        DWORD dwStatus;
+        GetExitCodeThread(hThr[i], &dwStatus);
+        if (dwStatus == STILL_ACTIVE)
+        {
+            SendMessage(listbox, LB_ADDSTRING, 0, (LPARAM)TEXT("Состояние потока : активный"));
+        }
+        else
+        {
+            wsprintf(buff, TEXT("Состояние потока : не активен, код = %d"), dwStatus);
+            SendMessage(listbox, LB_ADDSTRING, 0, (LPARAM)buff);
+        }
+
+        int priority = GetThreadPriority(hThr[i]);
+        wsprintf(buff, TEXT("Приоритет: %d"), priority);
+        SendMessage(listbox, LB_ADDSTRING, (WPARAM)0, (LPARAM)buff);
+
+        FILETIME lpCreationTime, lpExitTime, lpKernelTime, lpUserTime;
+        GetThreadTimes(hThr[i], &lpCreationTime, &lpExitTime, &lpKernelTime, &lpUserTime);
+        SYSTEMTIME lpSystemTime, lpCreationT, lpExitT;
+        if (hThr[i])
+        {
+            FileTimeToSystemTime(&lpCreationTime, &lpCreationT);
+            GetLocalTime(&lpExitT);
+            lpSystemTime = systemtime_difference(lpCreationT, lpExitT);
+        }
+        else
+        {
+            lpSystemTime.wMinute = 0;
+            lpSystemTime.wMilliseconds = 0;
+            lpSystemTime.wSecond = 0;
+        }
+
+        wsprintf(buff, TEXT("%d мин %d cек %d миллисек"), lpSystemTime.wMinute, lpSystemTime.wSecond, lpSystemTime.wMilliseconds);
+        SendMessage(listbox, LB_ADDSTRING, (WPARAM)0, (LPARAM)buff);
+
+        return (INT_PTR)TRUE;
+    }
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
+}
+SYSTEMTIME systemtime_difference(SYSTEMTIME const& st1, SYSTEMTIME const& st2)
+{
+    FILETIME ft1;
+    SystemTimeToFileTime(&st1, &ft1);
+    ULARGE_INTEGER const u1 = { ft1.dwLowDateTime, ft1.dwHighDateTime };
+
+    FILETIME ft2;
+    SystemTimeToFileTime(&st2, &ft2);
+    ULARGE_INTEGER const u2 = { ft2.dwLowDateTime, ft2.dwHighDateTime };
+
+    ULARGE_INTEGER u3;
+    u3.QuadPart = (u1.QuadPart > u2.QuadPart ? u1.QuadPart : u2.QuadPart) - (u1.QuadPart < u2.QuadPart ? u1.QuadPart : u2.QuadPart);
+    FILETIME const ft3 = { u3.LowPart, u3.HighPart };
+
+    SYSTEMTIME st3;
+    FileTimeToSystemTime(&ft3, &st3);
+    // FILETIME's starting point is 1601-01-01 
+    st3.wYear -= 1601;
+    st3.wMonth -= 1;
+    st3.wDay -= 1;
+    st3.wDayOfWeek = 0; // useless for this purpose, make it always 0 so it's always ignored 
+    return st3;
 }
