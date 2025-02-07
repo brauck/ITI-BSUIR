@@ -20,6 +20,7 @@ WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
 WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 DWORD dwThreadId[3] = { 0,0,0 };                // идентификаторы потоков
 HANDLE hThr[3] = { nullptr,nullptr, nullptr };  // дескрипторЫ потоков
+HANDLE hAnimate = nullptr;                      // дескриптор анимации
 DWORD g_uThCount = 0;                           // Количество созданных вторичных потоков
 DWORD g_uXPos = 10;
 DWORD g_uYPos = 40;
@@ -267,6 +268,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         } break;
         case IDM_INFO_TH2: {
             DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_INFO), hWnd, DlgInfoThread, 2);
+        } break;
+        //==========================================
+        //===ANIMATION==============================  
+        case IDM_ANIMATE:
+        {
+            hAnimate = CreateThread(nullptr, 0,
+                DraweImage, hWnd, 0, &dwThreadId[1]);
         } break;
         //==========================================
         case IDM_ABOUT:

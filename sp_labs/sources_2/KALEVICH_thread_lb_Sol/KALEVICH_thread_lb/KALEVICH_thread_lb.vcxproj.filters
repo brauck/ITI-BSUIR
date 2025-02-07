@@ -32,6 +32,9 @@
     <ClCompile Include="KALEVICH_thread_lb.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="KALEVICH_thread_lb.rc">

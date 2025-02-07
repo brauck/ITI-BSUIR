@@ -13,3 +13,6 @@
 #include <malloc.h>
 #include <memory.h>
 #include <tchar.h>
+
+extern HINSTANCE hInst;
+DWORD WINAPI DraweImage(PVOID pvParam);

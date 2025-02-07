@@ -133,6 +133,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Image.cpp" />
     <ClCompile Include="KALEVICH_thread_lb.cpp" />
   </ItemGroup>
   <ItemGroup>
