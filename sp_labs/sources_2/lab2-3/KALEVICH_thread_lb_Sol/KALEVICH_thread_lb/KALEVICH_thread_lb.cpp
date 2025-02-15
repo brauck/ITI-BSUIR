@@ -26,7 +26,8 @@ DWORD g_uXPos = 10;
 DWORD g_uYPos = 40;
 THREAD_PARAM ThrParam1 = { 1, g_uXPos, g_uYPos, nullptr };
 THREAD_PARAM ThrParam2 = { 2, g_uXPos, g_uYPos + 24, nullptr };
-// HANDLE hMutex;
+HANDLE hMutex = nullptr;
+BOOL fSyncOn = FALSE;
 
 // Forward declarations of functions included in this code module:
 ATOM                MyRegisterClass(HINSTANCE hInstance);
@@ -56,7 +57,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(lpCmdLine);
 
     // TODO: Place code here.
-    //hMutex = CreateMutex(nullptr, FALSE, TEXT("Mut1"));
+    hMutex = CreateMutex(nullptr, FALSE, nullptr);
 
     // Initialize global strings
     LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
@@ -128,7 +129,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    hInst = hInstance; // Store instance handle in our global variable
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
-       CW_USEDEFAULT, 0, 500, 500, nullptr, nullptr, hInstance, nullptr);
+       CW_USEDEFAULT, 0, 600, 500, nullptr, nullptr, hInstance, nullptr);
 
    if (!hWnd)
    {
@@ -271,6 +272,20 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 DraweImage, hWnd, 0, nullptr);
         } break;
         //==========================================
+        //===MUTEX==================================
+        case IDM_SYN_ON:
+        {
+            fSyncOn = TRUE;
+            EnableMenuItem(hMenu, IDM_SYN_OFF, MF_ENABLED);
+            EnableMenuItem(hMenu, IDM_SYN_ON, MF_GRAYED);
+        }break;
+        case IDM_SYN_OFF:
+        {
+            fSyncOn = FALSE;
+            EnableMenuItem(hMenu, IDM_SYN_ON, MF_ENABLED);
+            EnableMenuItem(hMenu, IDM_SYN_OFF, MF_GRAYED);
+        }break;
+        //==========================================
         case IDM_ABOUT:
             DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
             break;
@@ -334,7 +349,7 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
     RECT  rc;
     HDC   hDC;
     int cRun = 0; //Счетчик «пробегов» строки
-    int N = 3; // Размер серии из «пробегов»
+    int N = 2; // Размер серии из «пробегов»
 
     //Формирование текста бегущей строки
     wsprintf(CreepStr, TEXT("#### 90322, Калевич, № %d, идентификатор - 0x%08X. >>>>>"),
@@ -359,7 +374,7 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
         //Взаимное исключение одновременного вывода
         //серии строк более чем одним потоком
 
-       // WaitForSingleObject(hMutex, INFINITE);
+        if (fSyncOn) WaitForSingleObject(hMutex, INFINITE);
         ////////////////////////////////////////////////////
         //InvalidateRect(pThrParam->hWnd, &rc, TRUE);
         // 
@@ -410,9 +425,8 @@ DWORD WINAPI ThreadFunc1(PVOID pvParam)
             TextOut(hDC, rc.left, rc.bottom - 80 + 25 * pThrParam->Num, buf1, 14);
         }//Конец цикла вывода серии строк 
 
-     //конец критического участка кода – вывод серии строк
-       // ReleaseMutex(hMutex);
-
+         //конец критического участка кода – вывод серии строк
+         ReleaseMutex(hMutex);
     }
     return 0;
 }
