@@ -2,3 +2,6 @@ LIBRARY
 EXPORTS
 	fnKALEVICHDLL @1
 	nKALEVICHDLL  @2
+	Fun141		  @3
+	Fun142		  @4
+	Fun143		  @5

@@ -22,3 +22,6 @@ extern KALEVICHDLL_API int g_nFnCallsCount;
 extern KALEVICHDLL_API int nKALEVICHDLL;
 
 KALEVICHDLL_API int fnKALEVICHDLL(void);
+KALEVICHDLL_API double Fun141(int, int);
+KALEVICHDLL_API int WINAPI Fun142(int, int, int);
+KALEVICHDLL_API void Fun143(double in, double* out);
