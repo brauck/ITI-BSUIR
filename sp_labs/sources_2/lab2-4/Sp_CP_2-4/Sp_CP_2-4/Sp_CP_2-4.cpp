@@ -59,12 +59,13 @@ int main()
     reverse(test.begin(), test.end());
     cout << test << "\n";
      
-    // regex_search that searches pattern regexp in the string mystr  
-    //regex_search(lines[0], m, regexp);
+    /*std::ofstream out("output.txt");
+    out << words[0];
+    out.close();*/
 
-    cout << "String that matches the pattern:" << endl;
-    /*for (auto x : m)
-        cout << x << " ";*/
+    std::ofstream outfile;
 
+    outfile.open("test.txt", std::ios_base::app); // append instead of overwrite
+    outfile << "\n" << words[1];
     return 0;
 }
