@@ -9,8 +9,6 @@ int c = 3;
 BOOL DllExplicitLoading(HWND hWnd)
 {
     TCHAR txt[200];
-    // wsprintf(txt, TEXT("Переменная = %d , Функция = %d"), nSpLb24, fnSpLb24());
-    // MessageBox(hWnd, txt, TEXT("Вызов из Dll"), MB_OK);
     MessageBox(hWnd, TEXT("Явная загрузка Dll SPLB24.dll"),
         TEXT("Вызов из клиента с явной загрукой"), MB_OK);
 
@@ -99,7 +97,7 @@ BOOL DllExplicitLoading(HWND hWnd)
     *pFnCalls = *pFnCalls + 1;   //Incrementing g_nFnCallsCount variable in Dll    
     int Var1 = *pVar1; // Call the var nSpLb24 from Dll
 
-    _stprintf_s(txt, 200, TEXT("ЯЗ nKALEVICHDLL = %d , Функция = %d\n10 / 3 = %.2f\nFun142(a, b, c) = %d\nout after Fun143 = %.2f"),
+    _stprintf_s(txt, 200, TEXT("ЯЗ nKALEVICHDLL = %d , Функция = %d\nFun141(10, 3) 10 / 3 = %.2f\nFun142(a, b, c) = %d\nout after Fun143 = %.2f"),
         Var1, res, Fun141res, lpfnDllFun142(a, b, c), out);
     *pFnCalls = *pFnCalls + 1;
     MessageBox(hWnd, txt, TEXT(" Клиент. Явная загрузка"), MB_OK);
