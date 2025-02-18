@@ -5,6 +5,8 @@ VisualStudioVersion = 17.12.35707.178 d17.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Sp_CP_2-4", "Sp_CP_2-4\Sp_CP_2-4.vcxproj", "{A867420F-CFB5-47CC-8804-F3E99FE4E069}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ReverseWords", "ReverseWords\ReverseWords.vcxproj", "{257B4725-5BE4-454A-9D4F-A823D6C54208}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{A867420F-CFB5-47CC-8804-F3E99FE4E069}.Release|x64.Build.0 = Release|x64
 		{A867420F-CFB5-47CC-8804-F3E99FE4E069}.Release|x86.ActiveCfg = Release|Win32
 		{A867420F-CFB5-47CC-8804-F3E99FE4E069}.Release|x86.Build.0 = Release|Win32
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Debug|x64.ActiveCfg = Debug|x64
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Debug|x64.Build.0 = Debug|x64
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Debug|x86.ActiveCfg = Debug|Win32
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Debug|x86.Build.0 = Debug|Win32
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Release|x64.ActiveCfg = Release|x64
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Release|x64.Build.0 = Release|x64
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Release|x86.ActiveCfg = Release|Win32
+		{257B4725-5BE4-454A-9D4F-A823D6C54208}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
