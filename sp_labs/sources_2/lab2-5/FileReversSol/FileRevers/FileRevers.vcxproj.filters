@@ -24,17 +24,17 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SpLb24_IClient.h">
+    <ClInclude Include="FileRevers.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SpLb24_IClient.cpp">
+    <ClCompile Include="FileRevers.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="SpLb24_IClient.rc">
+    <ResourceCompile Include="FileRevers.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -42,7 +42,10 @@
     <Image Include="small.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="SpLb24_IClient.ico">
+    <Image Include="FileRevers.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="FileRev.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

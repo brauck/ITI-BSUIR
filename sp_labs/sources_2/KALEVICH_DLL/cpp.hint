@@ -1,2 +1,0 @@
-#define KALEVICHDLL_API __declspec(dllexport)
-#define KALEVICHDLL_API __declspec(dllimport)
