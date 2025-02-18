@@ -4,11 +4,8 @@
 #include "framework.h"
 #include "ReverseWords.h"
 
-//using namespace std;
-
 // This is an example of an exported variable
 REVERSEWORDS_API int nReverseWords=0;
-//REVERSEWORDS_API vector<string> lines;
 
 // This is an example of an exported function.
 REVERSEWORDS_API int fnReverseWords(void)
