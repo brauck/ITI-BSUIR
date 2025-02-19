@@ -187,7 +187,7 @@ int ReverseWords(LPCSTR filePath) {
 
     CHAR buffer[lNum];    
 
-    sprintf_s(buffer, sizeof(buffer), "\n\n--- Reveresed words ---\n");
+    sprintf_s(buffer, sizeof(buffer), "\n\n--- Reveresed words ---\n\n");
     WriteFile(hFile, buffer, strlen(buffer), NULL, NULL);
 
     for (int i = 0; i < wNum; i++)
