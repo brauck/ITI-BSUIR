@@ -8,6 +8,7 @@
 
 #define FILENAME "FILEREV.DAT"
 
+
 int ReverseWords(LPCSTR filePath);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
