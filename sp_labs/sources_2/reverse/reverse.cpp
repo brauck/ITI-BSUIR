@@ -10,7 +10,51 @@ int main()
     const char base[300] = "14. Rearrange the characters in each word in reverse order and write the resulting words to the end of the file (to reverse words, you can use the Windows library functions \"_strrev, _tcsrev, _mbsrev\").";
     cout << base << "\n\n";
 
+    char words[300][30] = { 0 };
     char word[30] = { 0 };
+
+    int w = 0;
+    int j = 0;
+    int wLen = 0;
+
+    for (int i = 0; i < strlen(base); i++)
+    {
+        if (!isalpha(base[i]) && !strlen(word))
+        {
+            continue;
+        }
+
+        if (!isalpha(base[i]) && strlen(word))
+        {
+            wLen = strlen(word);
+            for (int k = 0; k < wLen; k++)
+            {
+                words[w][k] = word[wLen - k - 1];
+            }
+            w++;
+            j = 0;
+            wLen = 0;
+            memset(word, 0, sizeof(word));
+            continue;
+        }
+
+        if (isalpha(base[i]))
+        {
+            word[j] = base[i];
+            j++;
+        }
+    }
+
+    for (int i = 0; i < 300; i++)
+    {
+        if (!words[i][0]) break;
+        cout << words[i] << "   ";
+    }
+
+
+
+
+    /*char word[30] = { 0 };
     char tempWord[30] = { 0 };
 
     int j = 0;
@@ -43,7 +87,7 @@ int main()
             word[j] = base[i];
             j++;
         }
-    }
+    }*/
 
     system("pause");
 }

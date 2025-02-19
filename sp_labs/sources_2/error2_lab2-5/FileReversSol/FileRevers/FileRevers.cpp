@@ -179,7 +179,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     default:
         return DefWindowProc(hWnd, message, wParam, lParam);
     }
-    return 0;
+    //return 0;
 }
 
 // Message handler for about box.
@@ -311,7 +311,7 @@ int reverseWords(LPWSTR fileName)
     /*wcslen(word);
     if (!iswalpha((wint_t)fileContent[0]) && !wcslen(word));*/
 
-    for (DWORD i = 0; i < 5; i++)
+    for (DWORD i = 0; i < dwFileSize; i++)
     {
         if (!iswalpha((wint_t)fileContent[i]) && !wcslen(word))
         {
@@ -329,6 +329,7 @@ int reverseWords(LPWSTR fileName)
             j = 0;
             wLen = 0;
             memset(word, 0, sizeof(word));
+            break;
             memset(tempWord, 0, sizeof(tempWord));
             continue;
         }
@@ -340,7 +341,7 @@ int reverseWords(LPWSTR fileName)
         }
     }
 
-    return 0;
+    //return 0;
     //===END TODO=====================================================================
 
     // Закрываем представление файла в окне адресного пространства
@@ -359,6 +360,15 @@ int reverseWords(LPWSTR fileName)
 
     CloseHandle(hFile);// Уменьшаем счетчик ссылок на объект ядра "Файл"
 
+
+    hFile = CreateFile(FILENAME, FILE_APPEND_DATA, 0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hFile == INVALID_HANDLE_VALUE) {
+        MessageBox(NULL, L"Ошибка открытия файла для записи.", L"Ошибка", MB_OK);
+        return 0;
+    }
+    //WriteFile(hFile, "\n\n=== Распределение слов по длине ===\n", 42, NULL, NULL);
+    WriteFile(hFile, tempWord, wcslen(tempWord), NULL, NULL);
+    CloseHandle(hFile);
      /*Запускаем NOTEPAD и загружаем в него созданный файл,
      чтобы увидеть плоды своих трудов*/
     //si.cb = sizeof(si);		// Заполняем поле размера структуры si
