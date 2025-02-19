@@ -1,18 +1,222 @@
+#include <windows.h>
+#include <tchar.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+#include "resource.h"
+#include <commdlg.h> 
 
-fidne#
-fidne#
-101           EULAV_DEMYS_TXEN_SPA_ enifed#
-0001         EULAV_LORTNOC_TXEN_SPA_ enifed#
-10004         EULAV_DNAMMOC_TXEN_SPA_ enifed#
-601        EULAV_ECRUOSER_TXEN_SPA_ enifed#
-SLOBMYS_YLNODAER_OIDUTSPA fednfi#
-DEKOVNI_OIDUTSPA fedfi#
- //
-stcejbo wen rof seulav tluafed txeN //
+#define FILENAME "FILEREV.DAT"
 
-501                       1UNEM_RDI enifed#
-301                     VERELIF_IDI enifed#
-//
-cr.veReliF ястеузьлопсИ //
-.++C lausiV tfosorciM в йыннадзос ,лйаф йымеачюлкВ //
-}}SEICNEDNEPED_ON{{//
+int ReverseWords(LPCSTR filePath);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hinstPrev,
+    LPSTR lpszCmdLine, int nCmdShow)
+{
+    WNDCLASS wc = { 0 };
+    wc.lpfnWndProc = WndProc;
+    wc.hInstance = hInst;
+    wc.lpszClassName = "ReverseWords";
+    wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+
+    RegisterClass(&wc);
+
+    HWND hwnd = CreateWindow("ReverseWords", "Words reversing",
+        WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT,
+        400, 300, NULL, NULL, hInst, NULL);
+
+    CreateWindow("BUTTON", "Открыть файл", WS_VISIBLE | WS_CHILD,
+        80, 80, 200, 40, hwnd, (HMENU)ID_OPENFILE, hInst, NULL);
+
+    ShowWindow(hwnd, nCmdShow);
+    UpdateWindow(hwnd);
+
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+    return msg.wParam;
+}
+
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg,
+    WPARAM wParam, LPARAM lParam)
+{
+    switch (msg) {
+    case WM_COMMAND:
+        if (LOWORD(wParam) == ID_OPENFILE)
+        {
+            OPENFILENAME ofn;
+            char szFile[MAX_PATH] = { 0 };
+
+            ZeroMemory(&ofn, sizeof(ofn));
+            ofn.lStructSize = sizeof(ofn);
+            ofn.hwndOwner = hwnd;
+            ofn.lpstrFilter = "Все файлы\0*.*\0";
+            ofn.lpstrFile = szFile;
+            ofn.nMaxFile = MAX_PATH;
+            ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
+
+            if (GetOpenFileName(&ofn))
+            {
+                ReverseWords(szFile);
+            }
+        }
+        break;
+
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    }
+    return DefWindowProc(hwnd, msg, wParam, lParam);
+}
+
+int ReverseWords(LPCSTR filePath) {
+    HANDLE hFile, hFileMap;
+    LPVOID lpvFile;
+    LPSTR fileContent;
+    DWORD dwFileSize;
+    int wordLengths[100] = { 0 };
+    const DWORD wNum = 10000; // максимальное количество слов
+    const DWORD lNum = 50;    // максимальное количество букв в слове
+
+    if (!CopyFile(filePath, FILENAME, FALSE))
+    {// Копирование не удалось
+        MessageBox(NULL, "New file could not be created.", "FileRev", MB_OK);
+        return 0;
+    }
+
+    // Открываем файл для чтения и записи. Для этого создаем объект ядра "Файл".
+    hFile = CreateFile(
+        FILENAME, GENERIC_READ | GENERIC_WRITE,
+        0, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        MessageBox(NULL, "File could not be opened.", "FileRev", MB_OK);
+        return 0;
+    }
+
+    // Узнаем размер файла. Второй параметр равен NULL, так как предполагается,
+    // что файл меньше 4 Гб.
+    dwFileSize = GetFileSize(hFile, NULL);
+
+    if (dwFileSize == INVALID_FILE_SIZE || dwFileSize == 0) {
+        MessageBox(NULL, "File is empty or error occured.", "FileRev", MB_OK);
+        CloseHandle(hFile);
+        return 0;
+    }
+
+    // Создаем объект "проецируемый файл".
+    hFileMap = CreateFileMapping(hFile, NULL, PAGE_READWRITE, 0, dwFileSize, NULL);
+    if (hFileMap == NULL) {
+        MessageBox(NULL, "File map could not be opened.", "FileRev", MB_OK);
+        CloseHandle(hFile);
+        return 0;
+    }
+
+    // Открываем отображение файла на виртуальное адресное пространство и
+    // получаем адрес, начиная с которого располагается образ файла в памяти.
+    lpvFile = MapViewOfFile(hFileMap, FILE_MAP_WRITE, 0, 0, 0);
+    if (lpvFile == NULL) {
+        MessageBox(NULL, "Could not map view of file.", "FileRev", MB_OK);
+        CloseHandle(hFileMap);
+        CloseHandle(hFile);
+        return 0;
+    }
+
+    //===TODO=============================================================
+    fileContent = (LPSTR)lpvFile;
+    int wordLength = 0;    
+
+    CHAR words[wNum][lNum] = { 0 };
+    CHAR word[lNum] = { 0 };
+
+    DWORD w = 0;    // индекс слова
+    DWORD j = 0;    // индекс буквы
+    DWORD wLen = 0; // длина слова
+
+    for (int i = 0; i < dwFileSize; i++)
+    {
+        if (!isalpha((BYTE)fileContent[i]) && !strlen(word))
+        {
+            continue;
+        }
+
+        if (!isalpha((BYTE)fileContent[i]) && strlen(word))
+        {
+            wLen = strlen(word);
+            for (int k = 0; k < wLen; k++)
+            {
+                words[w][k] = word[wLen - k - 1]; // reverse
+            }
+            w++;
+            j = 0;
+            wLen = 0;
+            memset(word, 0, sizeof(word));
+            continue;
+        }
+
+        if (isalpha((BYTE)fileContent[i]))
+        {
+            word[j] = fileContent[i];
+            j++;
+        }
+    }
+    //===END TODO================================================================
+    
+    // Закрываем представление файла в окне адресного пространства
+    UnmapViewOfFile(lpvFile);
+
+    // Уменьшаем счетчик ссылок на объект ядра "Проецируемый файл"
+    CloseHandle(hFileMap);
+
+    // Уменьшаем счетчик ссылок на объект ядра "Файл"
+    CloseHandle(hFile);
+
+    // Записываем обработанные данные в конец файла
+    hFile = CreateFile(FILENAME, FILE_APPEND_DATA, 0, NULL,
+        OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        MessageBox(NULL, "File could not be opened.", "FileRev", MB_OK);
+        return 0;
+    }
+
+    CHAR buffer[lNum];    
+
+    sprintf_s(buffer, sizeof(buffer), "\n\n--- Reveresed words ---\n");
+    WriteFile(hFile, buffer, strlen(buffer), NULL, NULL);
+
+    for (int i = 0; i < wNum; i++)
+    {
+        if (!words[i][0]) break;
+        sprintf_s(buffer, sizeof(buffer)," %s", words[i]);
+        WriteFile(hFile, buffer, strlen(buffer), NULL, NULL);
+    }
+
+    CloseHandle(hFile);
+
+    // Запускаем NOTEPAD и загружаем в него созданный файл
+    char cmd[MAX_PATH + 20];
+    sprintf_s(cmd, sizeof(cmd), "notepad.exe %s", FILENAME);
+
+    STARTUPINFO si = { 0 };
+    PROCESS_INFORMATION pi;
+    si.cb = sizeof(si);
+    si.wShowWindow = SW_SHOW;
+    si.dwFlags = STARTF_USESHOWWINDOW;
+
+    if (CreateProcess(NULL, cmd, NULL, NULL,
+        FALSE, 0, NULL, NULL, &si, &pi))
+    {
+        CloseHandle(pi.hThread);
+        CloseHandle(pi.hProcess);
+    }
+}
+
+
+--- Reveresed words ---
+ edulcni swodniw h edulcni rahct h edulcni gnirts h edulcni oidts h edulcni epytc h edulcni ecruoser h edulcni gldmmoc h enifed EMANELIF VERELIF TAD tni sdroWesreveR RTSCPL htaPelif TLUSERL KCABLLAC corPdnW DNWH TNIU MARAPW MARAPL tni IPANIW niaMniW ECNATSNIH tsnIh ECNATSNIH verPtsnih RTSPL eniLdmCzspl tni wohSdmCn SSALCDNW cw cw corPdnWnfpl corPdnW cw ecnatsnIh tsnIh cw emaNssalCzspl sdroWesreveR cw dnuorgkcaBrbh HSURBH ROLOC WODNIW cw rosruCh rosruCdaoL LLUN CDI WORRA ssalCretsigeR cw DNWH dnwh wodniWetaerC sdroWesreveR sdroW gnisrever SW WODNIWDEPPALREVO WC TLUAFEDESU WC TLUAFEDESU LLUN LLUN tsnIh LLUN wodniWetaerC NOTTUB SW ELBISIV SW DLIHC dnwh UNEMH DI ELIFNEPO tsnIh LLUN wodniWwohS dnwh wohSdmCn wodniWetadpU dnwh GSM gsm elihw egasseMteG gsm LLUN egasseMetalsnarT gsm egasseMhctapsiD gsm nruter gsm maraPw TLUSERL KCABLLAC corPdnW DNWH dnwh TNIU gsm MARAPW maraPw MARAPL maraPl hctiws gsm esac MW DNAMMOC fi DROWOL maraPw DI ELIFNEPO EMANELIFNEPO nfo rahc eliFzs XAM HTAP yromeMoreZ nfo foezis nfo nfo eziStcurtSl foezis nfo nfo renwOdnwh dnwh nfo retliFrtspl nfo eliFrtspl eliFzs nfo eliFxaMn XAM HTAP nfo sgalF NFO TSIXETSUMELIF NFO TSIXETSUMHTAP fi emaNeliFnepOteG nfo sdroWesreveR eliFzs kaerb esac MW YORTSED egasseMtiuQtsoP kaerb nruter corPwodniWfeD dnwh gsm maraPw maraPl tni sdroWesreveR RTSCPL htaPelif ELDNAH eliFh paMeliFh DIOVPL eliFvpl RTSPL tnetnoCelif DROWD eziSeliFwd tni shtgneLdrow tsnoc DROWD muNw tsnoc DROWD muNl fi eliFypoC htaPelif EMANELIF ESLAF xoBegasseM LLUN weN elif dluoc ton eb detaerc veReliF BM KO nruter eliFh eliFetaerC EMANELIF CIRENEG DAER CIRENEG ETIRW LLUN NEPO GNITSIXE ELIF ETUBIRTTA LAMRON LLUN fi eliFh DILAVNI ELDNAH EULAV xoBegasseM LLUN eliF dluoc ton eb denepo veReliF BM KO nruter LLUN eziSeliFwd eziSeliFteG eliFh LLUN fi eziSeliFwd DILAVNI ELIF EZIS eziSeliFwd xoBegasseM LLUN eliF si ytpme ro rorre derucco veReliF BM KO eldnaHesolC eliFh nruter paMeliFh gnippaMeliFetaerC eliFh LLUN EGAP ETIRWDAER eziSeliFwd LLUN fi paMeliFh LLUN xoBegasseM LLUN eliF pam dluoc ton eb denepo veReliF BM KO eldnaHesolC eliFh nruter eliFvpl eliFfOweiVpaM paMeliFh ELIF PAM ETIRW fi eliFvpl LLUN xoBegasseM LLUN dluoC ton pam weiv fo elif veReliF BM KO eldnaHesolC paMeliFh eldnaHesolC eliFh nruter ODOT tnetnoCelif RTSPL eliFvpl tni htgneLdrow RAHC sdrow muNw muNl RAHC drow muNl DROWD w DROWD j DROWD neLw rof tni i i eziSeliFwd i fi ahplasi ETYB tnetnoCelif i nelrts drow eunitnoc fi ahplasi ETYB tnetnoCelif i nelrts drow neLw nelrts drow rof tni k k neLw k sdrow w k drow neLw k esrever w j neLw tesmem drow foezis drow eunitnoc fi ahplasi ETYB tnetnoCelif i drow j tnetnoCelif i j DNE ODOT eliFfOweiVpamnU eliFvpl eldnaHesolC paMeliFh eldnaHesolC eliFh eliFh eliFetaerC EMANELIF ELIF DNEPPA ATAD LLUN NEPO GNITSIXE ELIF ETUBIRTTA LAMRON LLUN fi eliFh DILAVNI ELDNAH EULAV xoBegasseM LLUN eliF dluoc ton eb denepo veReliF BM KO nruter RAHC reffub muNl ftnirps s reffub foezis reffub n n desereveR sdrow n eliFetirW eliFh reffub nelrts reffub LLUN LLUN rof tni i i muNw i fi sdrow i kaerb ftnirps s reffub foezis reffub s sdrow i eliFetirW eliFh reffub nelrts reffub LLUN LLUN eldnaHesolC eliFh DAPETON rahc dmc XAM HTAP ftnirps s dmc foezis dmc dapeton exe s EMANELIF OFNIPUTRATS is SSECORP NOITAMROFNI ip is bc foezis is is wodniWwohSw WS WOHS is sgalFwd FTRATS WODNIWWOHSESU fi ssecorPetaerC LLUN dmc LLUN LLUN ESLAF LLUN LLUN is ip eldnaHesolC ip daerhTh eldnaHesolC ip ssecorPh

@@ -140,12 +140,12 @@ int ReverseWords(LPCSTR filePath) {
 
     for (int i = 0; i < dwFileSize; i++)
     {
-        if (!isalpha((CHAR)fileContent[i]) && !strlen(word))
+        if (!isalpha((BYTE)fileContent[i]) && !strlen(word))
         {
             continue;
         }
 
-        if (!isalpha((CHAR)fileContent[i]) && strlen(word))
+        if (!isalpha((BYTE)fileContent[i]) && strlen(word))
         {
             wLen = strlen(word);
             for (int k = 0; k < wLen; k++)
@@ -159,7 +159,7 @@ int ReverseWords(LPCSTR filePath) {
             continue;
         }
 
-        if (isalpha((CHAR)fileContent[i]))
+        if (isalpha((BYTE)fileContent[i]))
         {
             word[j] = fileContent[i];
             j++;

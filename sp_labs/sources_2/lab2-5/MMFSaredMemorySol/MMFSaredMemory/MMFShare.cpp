@@ -2,12 +2,9 @@
 #include <windowsx.h>
 #include "resource.h"
 
-//#define MMF_SIZE 4096
-//#define MMF_NAME TEXT("MMFSharedData")
 const DWORD dwMaximumSizeLow = 4096;
 HANDLE hFileMap = NULL;
 LPVOID lpView = NULL;
-
 
 BOOL InitMemoryMapping(HWND hwnd)
 {
