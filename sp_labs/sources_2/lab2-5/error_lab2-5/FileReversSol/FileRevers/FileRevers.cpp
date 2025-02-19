@@ -5,7 +5,6 @@
 #include "framework.h"
 #include "FileRevers.h"
 
-
 #define MAX_LOADSTRING 100
 //#define FILENAME "FILEREV.DAT"
 
@@ -251,8 +250,6 @@ int reverseWords(LPWSTR fileName)
     // что файл меньше 4 Гб.
     dwFileSize = GetFileSize(hFile, NULL);
 
-    TCHAR SS[100];
-    
     // Создаем объект "проецируемый файл". Он - на 2 байта больше
     // размера файла, чтобы можно было записать в конец файла нулевой 
     // символ  и работать с файлом как с нуль-терминированной строкой.
@@ -302,45 +299,44 @@ int reverseWords(LPWSTR fileName)
     
     LPWSTR fileContent = (LPWSTR)lpvFile;
 
-    WCHAR word[30] = { 0 };        // найденное слово
-    WCHAR tempWord[30] = { 0 };    // временное слово для реверса
+    char word[300] = { 0 };        // найденное слово
+    char tempWord[300] = { 0 };    // временное слово для реверса
 
     DWORD j = 0;
     DWORD wLen = 0; // длина слова
 
-    /*wcslen(word);
-    if (!iswalpha((wint_t)fileContent[0]) && !wcslen(word));*/
+    /*strlen(word);
+    if (!isalpha(fileContent[1]) && !strlen(word));*/
 
-    for (DWORD i = 0; i < 5; i++)
-    {
-        if (!iswalpha((wint_t)fileContent[i]) && !wcslen(word))
-        {
-            continue;
-        }
+    //for (DWORD i = 0; i < dwFileSize; i++)
+    //{
+    //    if (!isalpha(fileContent[i]) && !strlen(word))
+    //    {
+    //        continue;
+    //    }
 
-        if (!iswalpha((wint_t)fileContent[i]) && wcslen(word))
-        {
-            wLen = wcslen(word);
-            for (DWORD k = 0; k < wLen; k++)
-            {
-                tempWord[k] = word[wLen - k - 1];
-            }
-            //cout << tempWord << ' ';
-            j = 0;
-            wLen = 0;
-            memset(word, 0, sizeof(word));
-            memset(tempWord, 0, sizeof(tempWord));
-            continue;
-        }
+    //    if (!isalpha(fileContent[i]) && strlen(word))
+    //    {
+    //        wLen = strlen(word);
+    //        for (DWORD k = 0; k < wLen; k++)
+    //        {
+    //            tempWord[k] = word[wLen - k - 1];
+    //        }
+    //        //cout << tempWord << ' ';
+    //        j = 0;
+    //        wLen = 0;
+    //        memset(word, 0, sizeof(word));
+    //        memset(tempWord, 0, sizeof(tempWord));
+    //        continue;
+    //    }
 
-        if (iswalpha((wint_t)fileContent[i]))
-        {
-            word[j] = fileContent[i];
-            j++;
-        }
-    }
+    //    if (isalpha(fileContent[i]))
+    //    {
+    //        word[j] = fileContent[i];
+    //        j++;
+    //    }
+    //}
 
-    return 0;
     //===END TODO=====================================================================
 
     // Закрываем представление файла в окне адресного пространства
