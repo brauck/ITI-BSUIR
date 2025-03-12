@@ -1,15 +1,28 @@
+//Отобразить список фамилий слушателей в элементе управления «список
+//(ListBox)».Список получить из текстового файла, спецификация которого задаётся
+//в стандартном диалоге открытия файла.Для доступа к данным файла
+//использовать технологию проецирования файлов данных на адресное
+//пространство процесса.Обеспечить возможность добавления  фамилий в список
+//и в файл.
+
 #include <windows.h>
 #include <tchar.h>
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
 #include "resource.h"
-#include <commdlg.h> 
+#include <commdlg.h>
+#include <iostream>
+#include <vector>
+#include <string>
+
 
 #define FILENAME "FILEREV.DAT"
 
 int ReverseWords(LPCSTR filePath);
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+
+std::vector<std::string> names;
 
 int WINAPI WinMain(HINSTANCE hInst, HINSTANCE hinstPrev,
     LPSTR lpszCmdLine, int nCmdShow)
